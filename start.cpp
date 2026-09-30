@@ -53,6 +53,9 @@ class Menu{
                 case 2:
                     manager.load_game_saves();
                     break;
+                case 3:
+                    display_menu();
+                    break;
                 default:
                     cout << "Invalid choice. Returning to main menu." << endl;
                     display_menu();
