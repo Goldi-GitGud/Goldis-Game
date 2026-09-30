@@ -60,7 +60,41 @@ class Menu{
             }
         }
         void launch_pause(){
-
+            cout << "____________________________________________" << endl;
+            cout << "1. Resume Game" <<endl;
+            cout << "2. Save Game" <<endl;
+            cout<< "3. Change Difficulty" <<endl;
+            cout << "4. Return to Main Menu" <<endl;
+            cout<< "5. Exit Game" <<endl;
+            cout<< "___________________________________________" << endl;
+            cout<< "Enter your choice: ";
+            int choice;cin >> choice;
+            switch (choice)
+            {
+                case 1:
+                    game.resume_game();
+                    break;
+                case 2:
+                    manager.save_game_saves();
+                    break;
+                case 3:
+                    difficulty(4);
+                    break;
+                case 4:
+                    cout << "Saving game before returning to main menu..." << endl;
+                    manager.save_game_saves();
+                    display_menu();
+                    break;
+                case 5:
+                    cout << "Saving game before exiting..." << endl;
+                    manager.save_game_saves();
+                    launch_exit(0);
+                    break;
+                default:
+                    cout << "Invalid choice. Resuming game." << endl;
+                    game.resume_game();
+                    break;
+            }
         }
         void launch_options(){
             cout << "____________________________________________" << endl;
@@ -124,7 +158,7 @@ class Menu{
                     if(loc == 2)loc=3;
                     break;
                 default:
-                    cout << "Invalid choice. Returning to previous menu." << endl;
+                    cout << "Invalid choice." << endl;
                     break;
             }
             if(loc == 1){
