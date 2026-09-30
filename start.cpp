@@ -42,7 +42,7 @@ class Menu{
             switch (choice)
             {
             case 1:
-                difficulty();
+                difficulty(1);
                 break;
             case 2:
                 display_menu();
@@ -64,14 +64,14 @@ class Menu{
                 return;
             }
         }
-        void difficulty(){
+        void difficulty(int loc){
             cout << "____________________________________________" << endl;
             cout << "Current difficulty level: "<<game.get_difficulty()<<endl;;
             cout <<" choose difficulty level: " << endl;
             cout << "1. Easy (The enemies are weaker and you are a bit more stronger)" << endl;
             cout << "2. Normal (Balanced difficulty , recommended for most players)"<<endl;
             cout<<"3. Hard (The enemies are significantly stronger , recommended for experienced players)"<<endl;
-            cout<< "4. Return to Options Menu" << endl;
+            cout<< "4. Return to Previous Menu" << endl;
             cout<< "Note: This will affect all saves and can be changed from the options menu." << endl;
             cout << "____________________________________________" << endl;
             cout << "Enter your choice: ";
@@ -80,23 +80,29 @@ class Menu{
             switch(choice){
                 case 1:
                     game.set_difficulty(1);
-                    cout << "Difficulty level set to Easy.\n Returning to options menu." << endl;
+                    cout << "Difficulty level set to Easy." << endl;
                     break;
                 case 2:
                     game.set_difficulty(2);
-                    cout << "Difficulty level set to Normal.\n Returning to options menu." << endl;
+                    cout << "Difficulty level set to Normal." << endl;
                     break;
                 case 3:
                     game.set_difficulty(3);
-                    cout << "Difficulty level set to Hard.\n Returning to options menu." << endl;
-                    break;
-                case 4:
-                    launch_options();
+                    cout << "Difficulty level set to Hard." << endl;
                     break;
                 default:
-                    cout << "Invalid choice. Returning to options menu." << endl;
-                    launch_options();
+                    cout << "Invalid choice. Returning to previous menu." << endl;
                     break;
+            }
+            if(loc == 1){
+                cout<< "Returning to main menu." << endl;
+                display_menu();
+            }else if(loc == 2){
+                cout<<"Returning to game menu"<<endl;
+                launch_game();
+            }else{
+                cout<<"Returning to pause menu"<<endl;
+                launch_pause();
             }
         }
 
