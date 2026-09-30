@@ -1,6 +1,14 @@
 #include<iostream>
 using namespace std;
 
+class Game{
+
+}
+
+class Manager{
+
+}
+
 class Menu{
     public:
         void display_menu(){
@@ -30,6 +38,28 @@ class Menu{
         }
 
         void launch_game(){
+            cout<<"____________________________________________" << endl;
+            cout << "1. New Game" <<endl;
+            cout << "2. Load Game" <<endl;
+            cout << "3. Return to Main Menu" <<endl;
+            cout<< "___________________________________________" << endl;
+            cout<< "Enter your choice: ";
+            int choice;cin >> choice;
+            switch (choice)
+            {
+                case 1:
+                    difficulty(2);
+                    break;
+                case 2:
+                    manager.load_game_saves();
+                    break;
+                default:
+                    cout << "Invalid choice. Returning to main menu." << endl;
+                    display_menu();
+                    break;
+            }
+        }
+        void launch_pause(){
 
         }
         void launch_options(){
@@ -81,25 +111,31 @@ class Menu{
                 case 1:
                     game.set_difficulty(1);
                     cout << "Difficulty level set to Easy." << endl;
+                    if(loc == 2)loc=3;
                     break;
-                case 2:
+                    case 2:
                     game.set_difficulty(2);
                     cout << "Difficulty level set to Normal." << endl;
+                    if(loc == 2)loc=3;
                     break;
-                case 3:
+                    case 3:
                     game.set_difficulty(3);
                     cout << "Difficulty level set to Hard." << endl;
+                    if(loc == 2)loc=3;
                     break;
                 default:
                     cout << "Invalid choice. Returning to previous menu." << endl;
                     break;
             }
             if(loc == 1){
-                cout<< "Returning to main menu." << endl;
+                cout<< "Returning to main menu" << endl;
                 display_menu();
             }else if(loc == 2){
                 cout<<"Returning to game menu"<<endl;
                 launch_game();
+            }else if(loc == 3){
+                cout<<"Starting Game..."<<endl;
+                game.start_game();
             }else{
                 cout<<"Returning to pause menu"<<endl;
                 launch_pause();
@@ -109,7 +145,8 @@ class Menu{
 }
 
 int main()
-{
+{   
+    Manager manager;
     Game game;
     Menu menu;
     menu.display_menu();
