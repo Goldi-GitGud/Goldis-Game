@@ -47,7 +47,7 @@ class Player {
         void attack_enemy(Enemy& enemy);
         void take_damage(int damage);
         void gain_experience(int exp);
-        void dodge_attack();
+        bool dodge_attack();
         void change_weapon(const Weapon& new_weapon);
         void gain_gold(int amount);
         void lose_gold(int amount);
