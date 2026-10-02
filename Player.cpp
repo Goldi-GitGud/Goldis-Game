@@ -10,80 +10,80 @@ Player::Player() // this will be the default stats for default player class
     : health(100), attack_power(10), armor(5), level(1), experience(0), gold(0), dodge_chance(5), weapon(Weapon()) {
 }
 
-void Player::set_health(int h){
-    health =h;
+void Player::set_health(int h) {
+    health = h;
 }
-int Player::get_health() const{
+int Player::get_health() const {
     return health;
 }
-void Player::set_bonus_health(int bh){
+void Player::set_bonus_health(int bh) {
     bonus_health = bh;
 }
-int Player::get_bonus_health() const{
+int Player::get_bonus_health() const {
     return bonus_health;
 }
-int Player::get_attack_power() const{
+int Player::get_attack_power() const {
     return attack_power;
 }
-void Player::set_attack_power(int ap){
+void Player::set_attack_power(int ap) {
     attack_power = ap;
 }
-int Player::get_bonus_attack_power() const{
+int Player::get_bonus_attack_power() const {
     return bonus_attack_power;
 }
-void Player::set_bonus_attack_power(int bap){
+void Player::set_bonus_attack_power(int bap) {
     bonus_attack_power = bap;
 }
-int Player::get_armor() const{
+int Player::get_armor() const {
     return armor;
 }
-void Player::set_armor(int a){
+void Player::set_armor(int a) {
     armor = a;
 }
-int Player::get_bonus_armor() const{
+int Player::get_bonus_armor() const {
     return bonus_armor;
 }
-void Player::set_bonus_armor(int ba){
+void Player::set_bonus_armor(int ba) {
     bonus_armor = ba;
 }
-int Player::get_dodge_chance() const{
+int Player::get_dodge_chance() const {
     return dodge_chance;
 }
-void Player::set_dodge_chance(int d){
+void Player::set_dodge_chance(int d) {
     dodge_chance = d;
 }
-int Player::get_bonus_dodge_chance() const{
+int Player::get_bonus_dodge_chance() const {
     return bonus_dodge_chance;
 }
-void Player::set_bonus_dodge_chance(int bd){
+void Player::set_bonus_dodge_chance(int bd) {
     bonus_dodge_chance = bd;
 }
-int Player::get_level() const{
+int Player::get_level() const {
     return level;
 }
-void Player::set_level(int l){
+void Player::set_level(int l) {
     level = l;
 }
-int Player::get_experience() const{
+int Player::get_experience() const {
     return experience;
 }
-void Player::set_experience(int exp){
+void Player::set_experience(int exp) {
     experience = exp;
 }
-int Player::get_gold() const{
+int Player::get_gold() const {
     return gold;
 }
-void Player::set_gold(int g){
+void Player::set_gold(int g) {
     gold = g;
 }
-const Weapon& Player::get_weapon() const{
+const Weapon& Player::get_weapon() const {
     return weapon;
 }
-void Player::equip_weapon(const Weapon& w){
+void Player::equip_weapon(const Weapon& w) {
     weapon = w;
 }
 void Player::display_stats() const {
-    cout<< "____________________________________________" << endl;
+    cout << "____________________________________________" << endl;
     cout << "Player Stats:" << endl;
     cout << "Health: " << health << endl;
     cout << "Attack Power: " << attack_power << endl;
@@ -95,10 +95,10 @@ void Player::display_stats() const {
     cout << "Equipped Weapon: " << weapon.get_name() << endl;
     cout << "Weapon Stats:" << endl;
     weapon.display_stats();
-    cout<< "____________________________________________" << endl;
+    cout << "____________________________________________" << endl;
 }
 void Player::attack_enemy(Enemy& enemy) {
-    if(roll_chance(enemy.get_dodge_chance())) {
+    if (roll_chance(enemy.get_dodge_chance())) {
         cout << "The enemy dodged your attack!" << endl;
         return;
     }
@@ -106,14 +106,14 @@ void Player::attack_enemy(Enemy& enemy) {
     if (damage < 0) damage = 0;
     enemy.take_damage(damage);
     cout << "You attacked the enemy for " << damage << " damage!" << endl;
-    if(enemy.get_health() <= 0) {
+    if (enemy.get_health() <= 0) {
         cout << "You defeated the enemy!" << endl;
         gain_experience(enemy.get_experience_reward());
         gain_gold(enemy.get_gold_reward());
     }
 }
 void Player::take_damage(int damage) {
-    if(dodge_attack()) {
+    if (dodge_attack()) {
         return;
     }
     int total_armor = armor + bonus_armor;
@@ -160,7 +160,7 @@ void Player::lose_experience(int amount) {
 void Player::player_death() {
     cout << "You have died!" << endl;
     lose_experience(experience / 2);
-    lose_gold((double)gold*0.4);
+    lose_gold((double)gold * 0.4);
 }
 void Player::gain_level() {
     level++;

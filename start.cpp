@@ -14,7 +14,7 @@ int main()
 {
     Menu menu;
     Player player;
-    Enemy enemy;
+    Enemy enemy;// enemy classes will be a json file
     Weapon weapon;
     Item item;
     Bag bag;//for carrying items/weapons
