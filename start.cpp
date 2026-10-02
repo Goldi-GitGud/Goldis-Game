@@ -16,7 +16,9 @@ int main()
     Player player;
     Enemy enemy;
     Weapon weapon;
-    Player_class player_class;
+    Item item;
+    Bag bag;//for carrying items/weapons
+    // Player_class player_class; this will be a json file
     Combat combat;
     Game game;
     Manager manager;
