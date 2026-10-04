@@ -1,5 +1,6 @@
 #include "Enemy.h"
 #include "Player.h"
+#include "Utils.h"
 #include <iostream>
 #include <fstream>
 #include <nlohmann/json.hpp>
