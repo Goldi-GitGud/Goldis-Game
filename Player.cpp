@@ -98,19 +98,10 @@ void Player::display_stats() const {
     cout << "____________________________________________" << endl;
 }
 void Player::attack_enemy(Enemy& enemy) {
-    if (roll_chance(enemy.get_dodge_chance())) {
-        cout << "The enemy dodged your attack!" << endl;
-        return;
-    }
     int damage = attack_power + bonus_attack_power - enemy.get_armor();
     if (damage < 0) damage = 0;
     enemy.take_damage(damage);
     cout << "You attacked the enemy for " << damage << " damage!" << endl;
-    if (enemy.get_health() <= 0) {
-        cout << "You defeated the enemy!" << endl;
-        gain_experience(enemy.get_experience_reward());
-        gain_gold(enemy.get_gold_reward());
-    }
 }
 void Player::take_damage(int damage) {
     if (dodge_attack()) {

@@ -29,6 +29,7 @@ private:
 public:
     Enemy(EnemyType et);
     EnemyType get_type() const;
+    std::string type_to_string() const;
     int get_health() const;
     int get_attack_power() const;
     int get_armor() const;
@@ -41,5 +42,7 @@ public:
     void set_armor(int a);
     void set_dodge_chance(int d);
     void set_min_level_req(int l);
-    std::string type_to_string() const;
+    void take_damage(int damage);
+    void attack_player(Player& player);
+    bool dodge_attack();
 };
