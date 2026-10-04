@@ -3,25 +3,29 @@
 #include "Utils.h"
 #include <iostream>
 #include <fstream>
+#include <stdexcept>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 using namespace std;
 
-
-Enemy::Enemy(EnemyType et)
-    : type(et) {
-    std::ifstream file("Enemy_data.json");
-    if (!file) {
-        throw std::runtime_error("Could not open Enemy_data.json");
-    }
-    json data;
-    file >> data;
-    health = data[type_to_string()]["Hp"];
-    attack_power = data[type_to_string()]["Attack"];
-    armor = data[type_to_string()]["Armor"];
-    dodge_chance = data[type_to_string()]["Dodge"];
-    min_level_req = data[type_to_string()]["MinLevel"];
+static const json& enemy_data() {
+    static const json data = [] {
+        std::ifstream file("Enemy_data.json");
+        if (!file) throw std::runtime_error("Could not open Enemy_data.json");
+        json j;
+        file >> j;
+        return j;
+        }();
+    return data;
+}
+Enemy::Enemy(EnemyType et) : type(et) {
+    const json& e = enemy_data().at(type_to_string());
+    health = e.at("Hp");
+    attack_power = e.at("Attack");
+    armor = e.at("Armor");
+    dodge_chance = e.at("Dodge");
+    min_level_req = e.at("MinLevel");
 }
 Enemy::EnemyType Enemy::get_type() const {
     return type;
@@ -87,14 +91,13 @@ void Enemy::take_damage(int damage) {
     }
     health -= damage;
     if (health <= 0) {
-        cout << "You defeated the a " << type_to_string() << "!" << endl;
-        die();
+        cout << "You defeated a " << type_to_string() << "!" << endl;
     }
 }
 void Enemy::attack_player(Player& player) {
     player.take_damage(attack_power);
     cout << "The enemy attacked you for " << attack_power << " damage!" << endl;
 }
-bool Enemy::dodge_attack() {
+bool Enemy::dodge_attack() const {
     return roll_chance(dodge_chance);
 }

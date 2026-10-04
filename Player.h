@@ -1,5 +1,9 @@
 #pragma once
 
+class Weapon; // Forward declaration of Weapon class
+class Item; // Forward declaration of Item class
+class Enemy; // Forward declaration of Enemy class
+
 class Player {
 private:
     int health;

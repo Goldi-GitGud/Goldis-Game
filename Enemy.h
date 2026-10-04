@@ -1,4 +1,7 @@
 #pragma once
+#include <string>
+
+class Player; // Forward declaration of Player class
 
 class Enemy {
 public:
@@ -10,7 +13,7 @@ public:
         Orc,
         Skeleton,
         Troll,
-        cyclop,
+        Cyclop,
         Dragon,
         Lich,
         Vampire,
@@ -44,5 +47,5 @@ public:
     void set_min_level_req(int l);
     void take_damage(int damage);
     void attack_player(Player& player);
-    bool dodge_attack();
+    bool dodge_attack() const;
 };
