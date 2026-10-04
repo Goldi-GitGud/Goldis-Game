@@ -3,6 +3,7 @@
 class Enemy {
 public:
     enum class EnemyType {
+        // will sort them by level for randomizer
         Slime,
         Goblin,
         Zombie,
@@ -23,24 +24,22 @@ private:
     int attack_power;
     int armor;
     int dodge_chance;
-    int level;
+    int min_level_req;
 
 public:
-    Enemy(int h, int ap, int a, int d, int l);
-    Enemy();
+    Enemy(EnemyType et);
+    EnemyType get_type() const;
     int get_health() const;
     int get_attack_power() const;
     int get_armor() const;
     int get_dodge_chance() const;
-    int get_level() const;
+    int get_min_level_req() const;
     int get_experience_reward() const;
     int get_gold_reward() const;
     void set_health(int h);
     void set_attack_power(int ap);
     void set_armor(int a);
     void set_dodge_chance(int d);
-    void set_level(int l);
-    void take_damage(int damage);
-    void attack_player(Player& player);
-    EnemyType get_type() const;
+    void set_min_level_req(int l);
+    std::string type_to_string() const;
 };

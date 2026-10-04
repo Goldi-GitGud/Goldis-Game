@@ -1,0 +1,16 @@
+{
+    "Goblin":{
+        "Hp":50,
+        "Attack":10,
+        "Armor":3,
+        "Dodge":2,
+        "MinLevel":1
+    },
+    "Zombie":{
+        "Hp":70,
+        "attack":7,
+        "armor":7,
+        "dodge":0,
+        "MinLevel":1
+    }
+}
