@@ -8,4 +8,4 @@ public:
     void launch_options();
     void launch_exit(int exit_code);
     void difficulty(int loc);
-}
+};

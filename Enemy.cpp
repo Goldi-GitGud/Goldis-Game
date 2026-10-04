@@ -38,7 +38,7 @@ string Enemy::type_to_string() const {
     case EnemyType::Orc: return "Orc";
     case EnemyType::Skeleton: return "Skeleton";
     case EnemyType::Troll: return "Troll";
-    case EnemyType::cyclop: return "cyclop";
+    case EnemyType::Cyclop: return "Cyclop";
     case EnemyType::Dragon: return "Dragon";
     case EnemyType::Lich: return "Lich";
     case EnemyType::Vampire: return "Vampire";
@@ -100,4 +100,7 @@ void Enemy::attack_player(Player& player) {
 }
 bool Enemy::dodge_attack() const {
     return roll_chance(dodge_chance);
+}
+bool Enemy::is_alive() const {
+    return health > 0;
 }

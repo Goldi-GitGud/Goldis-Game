@@ -6,20 +6,22 @@ using namespace std;
 
 Player::Player(int h, int ap, int a, int l, int exp, int g, int d, const Weapon& w)
     : health(h), attack_power(ap), armor(a), level(l), experience(exp), gold(g), dodge_chance(d), weapon(w) {
+    bonus_health = 0;
+    bonus_attack_power = 0;
+    bonus_armor = 0;
+    bonus_dodge_chance = 0;
 }
 
 Player::Player() // this will be the default stats for default player class
     : health(100), attack_power(10), armor(5), level(1), experience(0), gold(0), dodge_chance(5), weapon(Weapon()) {
+    bonus_health = 0;
+    bonus_attack_power = 0;
+    bonus_armor = 0;
+    bonus_dodge_chance = 0;
 }
 
-void Player::set_health(int h) {
-    health = h;
-}
 int Player::get_health() const {
     return health;
-}
-void Player::set_bonus_health(int bh) {
-    bonus_health = bh;
 }
 int Player::get_bonus_health() const {
     return bonus_health;
@@ -27,59 +29,65 @@ int Player::get_bonus_health() const {
 int Player::get_attack_power() const {
     return attack_power;
 }
-void Player::set_attack_power(int ap) {
-    attack_power = ap;
-}
 int Player::get_bonus_attack_power() const {
     return bonus_attack_power;
-}
-void Player::set_bonus_attack_power(int bap) {
-    bonus_attack_power = bap;
 }
 int Player::get_armor() const {
     return armor;
 }
-void Player::set_armor(int a) {
-    armor = a;
-}
 int Player::get_bonus_armor() const {
     return bonus_armor;
-}
-void Player::set_bonus_armor(int ba) {
-    bonus_armor = ba;
 }
 int Player::get_dodge_chance() const {
     return dodge_chance;
 }
-void Player::set_dodge_chance(int d) {
-    dodge_chance = d;
-}
 int Player::get_bonus_dodge_chance() const {
     return bonus_dodge_chance;
-}
-void Player::set_bonus_dodge_chance(int bd) {
-    bonus_dodge_chance = bd;
 }
 int Player::get_level() const {
     return level;
 }
-void Player::set_level(int l) {
-    level = l;
-}
 int Player::get_experience() const {
     return experience;
-}
-void Player::set_experience(int exp) {
-    experience = exp;
 }
 int Player::get_gold() const {
     return gold;
 }
-void Player::set_gold(int g) {
-    gold = g;
-}
 const Weapon& Player::get_weapon() const {
     return weapon;
+}
+void Player::set_health(int h) {
+    health = h;
+}
+void Player::set_bonus_health(int bh) {
+    bonus_health = bh;
+}
+void Player::set_attack_power(int ap) {
+    attack_power = ap;
+}
+void Player::set_bonus_attack_power(int bap) {
+    bonus_attack_power = bap;
+}
+void Player::set_armor(int a) {
+    armor = a;
+}
+void Player::set_bonus_armor(int ba) {
+    bonus_armor = ba;
+}
+void Player::set_dodge_chance(int d) {
+    dodge_chance = d;
+}
+void Player::set_bonus_dodge_chance(int bd) {
+    bonus_dodge_chance = bd;
+}
+void Player::set_level(int l) {
+    level = l;
+}
+void Player::set_experience(int exp) {
+    experience = exp;
+}
+void Player::set_gold(int g) {
+    gold = g;
 }
 void Player::equip_weapon(const Weapon& w) {
     weapon = w;
@@ -119,18 +127,12 @@ void Player::take_damage(int damage) {
     }
 }
 void Player::gain_experience(int exp) {
+    // this still needs to be adjusted and edge cases handled, but it works for now
     experience += exp;
     cout << "You gained " << exp << " experience!" << endl;
-    if (experience >= level * 100) {
+    while (experience >= level * 100) {
         gain_level();
     }
-}
-bool Player::dodge_attack() {
-    if (roll_chance(dodge_chance + bonus_dodge_chance)) {
-        cout << "You dodged the enemy's attack!" << endl;
-        return true;
-    }
-    return false;
 }
 void Player::change_weapon(const Weapon& new_weapon) {
     weapon = new_weapon;
@@ -153,11 +155,11 @@ void Player::lose_experience(int amount) {
 void Player::player_death() {
     cout << "You have died!" << endl;
     lose_experience(experience / 2);
-    lose_gold((double)gold * 0.4);
+    lose_gold(static_cast<int>(gold * 0.4));
 }
 void Player::gain_level() {
+    // stats will be adjusted later
     level++;
-    experience = 0;
     health += 20;
     attack_power += 5;
     armor += 2;
@@ -183,4 +185,14 @@ void Player::increase_armor(int amount) {
 void Player::increase_dodge_chance(int amount) {
     dodge_chance += amount;
     cout << "Your dodge chance increased by " << amount << "%!" << endl;
+}
+bool Player::dodge_attack() {
+    if (roll_chance(dodge_chance + bonus_dodge_chance)) {
+        cout << "You dodged the enemy's attack!" << endl;
+        return true;
+    }
+    return false;
+}
+bool Player::is_alive() const {
+    return health > 0;
 }

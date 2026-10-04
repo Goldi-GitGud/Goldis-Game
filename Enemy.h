@@ -30,7 +30,7 @@ private:
     int min_level_req;
 
 public:
-    Enemy(EnemyType et);
+    explicit Enemy(EnemyType et);
     EnemyType get_type() const;
     std::string type_to_string() const;
     int get_health() const;
@@ -48,4 +48,5 @@ public:
     void take_damage(int damage);
     void attack_player(Player& player);
     bool dodge_attack() const;
+    bool is_alive() const;
 };

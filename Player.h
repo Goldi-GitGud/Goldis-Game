@@ -1,7 +1,7 @@
 #pragma once
 
-class Weapon; // Forward declaration of Weapon class
-class Item; // Forward declaration of Item class
+#include "Weapon.h"
+#include "Item.h"
 class Enemy; // Forward declaration of Enemy class
 
 class Player {
@@ -33,7 +33,7 @@ public:
     int get_level() const;
     int get_experience() const;
     int get_gold() const;
-    Weapon get_weapon() const;
+    const Weapon& get_weapon() const;
     void set_health(int h);
     void set_bonus_health(int bh);
     void set_attack_power(int ap);
@@ -51,7 +51,6 @@ public:
     void attack_enemy(Enemy& enemy);
     void take_damage(int damage);
     void gain_experience(int exp);
-    bool dodge_attack();
     void change_weapon(const Weapon& new_weapon);
     void gain_gold(int amount);
     void lose_gold(int amount);
@@ -63,4 +62,6 @@ public:
     void increase_attack_power(int amount);
     void increase_armor(int amount);
     void increase_dodge_chance(int amount);
-}
+    bool dodge_attack();
+    bool is_alive() const;
+};
