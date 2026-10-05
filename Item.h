@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 
+class Player; // Forward declaration of Player class (Player.h includes Item.h, so we can't include it back)
+
 class Item {
 public:
     enum class ItemType {
@@ -16,7 +18,7 @@ public:
         Large_Defense_potion,
         Large_Dodge_potion,
         Large_Attack_potion,
-    }
+    };
 private:
     ItemType type;
     int health_bonus;
@@ -31,6 +33,10 @@ public:
     int getArmorBonus() const;
     int getDodgeBonus() const;
     std::string Type_to_string(ItemType it) const;
+    std::string get_name() const;
+    // Health heals right away. Attack/armor/dodge go into the player's bonus stats
+    // and last until Player::clear_temporary_effects() (called when a wave ends).
+    void apply_effect(Player& player) const;
     void setHealthBonus(int bonus);
     void setAttackBonus(int bonus);
     void setArmorBonus(int bonus);

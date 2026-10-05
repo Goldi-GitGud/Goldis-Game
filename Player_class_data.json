@@ -1,20 +1,83 @@
 {
     "Warrior":{
         "Health":100,
-        "Attack":10,
+        "AttackPower":10,
         "Armor":5,
-        "Dodge":5,
-        "Weapon":"Sword",
-        "Level":3,
-        "Gold":600
+        "DodgeChance":5,
+        "WeaponType":"Sword",
+        "Level":1,
+        "Gold":0
     },
     "Knight":{
         "Health":130,
-        "Attack":8,
+        "AttackPower":8,
         "Armor":10,
-        "Dodge":2,
-        "Weapon":"Greatsword",
-        "Level":3,
-        "Gold":600
+        "DodgeChance":2,
+        "WeaponType":"Greatsword",
+        "Level":1,
+        "Gold":0
+    },
+    "Rogue":{
+        "Health":80,
+        "AttackPower":12,
+        "Armor":2,
+        "DodgeChance":15,
+        "WeaponType":"Sword",
+        "Level":1,
+        "Gold":0
+    },
+    "Paladin":{
+        "Health":120,
+        "AttackPower":9,
+        "Armor":8,
+        "DodgeChance":3,
+        "WeaponType":"Sword",
+        "Level":1,
+        "Gold":0
+    },
+    "Berserker":{
+        "Health":110,
+        "AttackPower":14,
+        "Armor":3,
+        "DodgeChance":4,
+        "WeaponType":"Greatsword",
+        "Level":1,
+        "Gold":0
+    },
+    "Monk":{
+        "Health":95,
+        "AttackPower":11,
+        "Armor":4,
+        "DodgeChance":12,
+        "WeaponType":"Sword",
+        "Level":1,
+        "Gold":0
+    },
+    "Assassin":{
+        "Health":75,
+        "AttackPower":13,
+        "Armor":2,
+        "DodgeChance":18,
+        "WeaponType":"Sword",
+        "Level":1,
+        "Gold":0
+    },
+    "Duelist":{
+        "Health":90,
+        "AttackPower":11,
+        "Armor":4,
+        "DodgeChance":14,
+        "WeaponType":"Sword",
+        "Level":1,
+        "Gold":0
+    },
+    "Hunter":{
+        "Health":90,
+        "AttackPower":11,
+        "Armor":3,
+        "DodgeChance":10,
+        "WeaponType":"Sword",
+        "Level":1,
+        "Gold":0
     }
 }

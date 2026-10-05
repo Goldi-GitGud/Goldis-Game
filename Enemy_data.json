@@ -8,9 +8,9 @@
     },
     "Zombie":{
         "Hp":70,
-        "attack":7,
-        "armor":7,
-        "dodge":0,
+        "Attack":7,
+        "Armor":7,
+        "Dodge":0,
         "MinLevel":1
     }
 }

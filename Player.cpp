@@ -19,33 +19,50 @@ static const json& player_data() {
     return data;
 }
 
+// These two are free functions (not Player members) so the constructor can use them
+// in its initializer list, before the Player object is fully built.
+static string class_name(Player::PlayerClass pc) {
+    switch (pc) {
+    case Player::PlayerClass::Warrior: return "Warrior";
+    case Player::PlayerClass::Knight: return "Knight";
+    case Player::PlayerClass::Rogue: return "Rogue";
+    case Player::PlayerClass::Paladin: return "Paladin";
+    case Player::PlayerClass::Berserker: return "Berserker";
+    case Player::PlayerClass::Monk: return "Monk";
+    case Player::PlayerClass::Assassin: return "Assassin";
+    case Player::PlayerClass::Duelist: return "Duelist";
+    case Player::PlayerClass::Hunter: return "Hunter";
+    default: return "Unknown";
+    }
+}
+static const json& player_entry(Player::PlayerClass pc) {
+    return player_data().at(class_name(pc));
+}
+
+// Weapon has no default constructor, so it has to be built in the initializer list
+// (the part after the colon), before the constructor body runs.
 Player::Player(PlayerClass pc)
-    : type(pc) {
-    const json& p = player_data().at(Type_to_string());
+    : type(pc),
+      weapon(Weapon::string_to_type(player_entry(pc).at("WeaponType").get<string>())) {
+    const json& p = player_entry(pc);
     health = p.at("Health");
     attack_power = p.at("AttackPower");
     armor = p.at("Armor");
     dodge_chance = p.at("DodgeChance");
-    weapon = Weapon(static_cast<Weapon::WeaponType>(p.at("WeaponType")));
     level = p.at("Level");
     gold = p.at("Gold");
     experience = 0;
     bonus_health = weapon.getHealthBonus();
-    bonus_attack_power = weapon.getAttackPowerBonus();
+    bonus_attack_power = weapon.getAttackBonus();
     bonus_armor = weapon.getArmorBonus();
-    bonus_dodge_chance = weapon.getDodgeChanceBonus();
+    bonus_dodge_chance = weapon.getDodgeBonus();
 }
 
-Player::Player() // this will be the default stats for default player class
-    : health(100), attack_power(10), armor(5), level(1), experience(0), gold(0), dodge_chance(5), weapon(Weapon()) {
-    bonus_health = 0;
-    bonus_attack_power = 0;
-    bonus_armor = 0;
-    bonus_dodge_chance = 0;
-}
-
-PlayerClass Player::getType() const {
+Player::PlayerClass Player::getType() const {
     return type;
+}
+string Player::Type_to_string() const {
+    return class_name(type);
 }
 int Player::get_health() const {
     return health;
@@ -124,7 +141,7 @@ void Player::equip_weapon(const Weapon& w) {
 }
 void Player::display_stats() const {
     cout << "____________________________________________" << endl;
-    cout << "Player Stats:" << endl;
+    cout << "Player Stats (" << Type_to_string() << "):" << endl;
     cout << "Health: " << health << endl;
     cout << "Attack Power: " << attack_power << endl;
     cout << "Armor: " << armor << endl;
@@ -163,13 +180,25 @@ void Player::gain_experience(int exp) {
         gain_level();
     }
 }
+// Swaps the old weapon's bonuses for the new weapon's, so potion boosts on top of them are kept.
 void Player::change_weapon(const Weapon& new_weapon) {
+    bonus_health -= weapon.getHealthBonus();
+    bonus_attack_power -= weapon.getAttackBonus();
+    bonus_armor -= weapon.getArmorBonus();
+    bonus_dodge_chance -= weapon.getDodgeBonus();
     weapon = new_weapon;
     cout << "You equipped a new weapon: " << weapon.get_name() << endl;
+    bonus_health += weapon.getHealthBonus();
+    bonus_attack_power += weapon.getAttackBonus();
+    bonus_armor += weapon.getArmorBonus();
+    bonus_dodge_chance += weapon.getDodgeBonus();
+}
+// Potions add to the bonus stats, so resetting them to just the weapon's bonuses removes the potion boosts.
+void Player::clear_temporary_effects() {
     bonus_health = weapon.getHealthBonus();
-    bonus_attack_power = weapon.getAttackPowerBonus();
+    bonus_attack_power = weapon.getAttackBonus();
     bonus_armor = weapon.getArmorBonus();
-    bonus_dodge_chance = weapon.getDodgeChanceBonus();
+    bonus_dodge_chance = weapon.getDodgeBonus();
 }
 void Player::gain_gold(int amount) {
     gold += amount;

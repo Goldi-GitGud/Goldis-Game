@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include "Weapon.h"
 #include "Item.h"
 class Enemy; // Forward declaration of Enemy class
@@ -35,6 +36,7 @@ private:
 public:
     explicit Player(PlayerClass pc);
     PlayerClass getType() const;
+    std::string Type_to_string() const;
     int get_health() const;
     int get_bonus_health() const;
     int get_attack_power() const;
@@ -66,6 +68,7 @@ public:
     void take_damage(int damage);
     void gain_experience(int exp);
     void change_weapon(const Weapon& new_weapon);
+    void clear_temporary_effects(); // potion boosts wear off; only the weapon's bonuses stay
     void gain_gold(int amount);
     void lose_gold(int amount);
     void lose_experience(int amount);

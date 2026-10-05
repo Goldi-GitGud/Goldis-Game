@@ -14,7 +14,7 @@ public:
         Katana,
         Twinblade,
         Saber
-    }
+    };
 private:
     WeaponType type;
     int health_bonus;
@@ -29,9 +29,11 @@ public:
     int getArmorBonus() const;
     int getDodgeBonus() const;
     std::string Type_to_string(WeaponType wt) const;
+    static WeaponType string_to_type(const std::string& name); // "Sword" -> WeaponType::Sword (used by JSON loading)
+    std::string get_name() const;
+    void display_stats() const;
     void setHealthBonus(int bonus);
     void setAttackBonus(int bonus);
     void setArmorBonus(int bonus);
     void setDodgeBonus(int bonus);
-    void display_stats() const;
 };

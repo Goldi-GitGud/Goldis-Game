@@ -1,4 +1,6 @@
 #include "Item.h"
+#include "Player.h"
+#include <iostream>
 #include <fstream>
 #include <stdexcept>
 #include <nlohmann/json.hpp>
@@ -17,7 +19,7 @@ static const json& item_data() {
     return data;
 }
 Item::Item(ItemType it) : type(it) {
-    const json& i = item_data().at(Type_to_string());
+    const json& i = item_data().at(Type_to_string(it));
     health_bonus = i.at("HealthBonus");
     attack_bonus = i.at("AttackBonus");
     armor_bonus = i.at("ArmorBonus");
@@ -53,6 +55,26 @@ string Item::Type_to_string(ItemType it) const {
     case ItemType::Large_Dodge_potion: return "Large_Dodge_potion";
     case ItemType::Large_Attack_potion: return "Large_Attack_potion";
     default: return "Unknown";
+    }
+}
+string Item::get_name() const {
+    return Type_to_string(type);
+}
+void Item::apply_effect(Player& player) const {
+    if (health_bonus > 0) {
+        player.heal(health_bonus);
+    }
+    if (attack_bonus > 0) {
+        player.set_bonus_attack_power(player.get_bonus_attack_power() + attack_bonus);
+        cout << "Your attack power is boosted by " << attack_bonus << " until the wave ends!" << endl;
+    }
+    if (armor_bonus > 0) {
+        player.set_bonus_armor(player.get_bonus_armor() + armor_bonus);
+        cout << "Your armor is boosted by " << armor_bonus << " until the wave ends!" << endl;
+    }
+    if (dodge_bonus > 0) {
+        player.set_bonus_dodge_chance(player.get_bonus_dodge_chance() + dodge_bonus);
+        cout << "Your dodge chance is boosted by " << dodge_bonus << "% until the wave ends!" << endl;
     }
 }
 void Item::setHealthBonus(int bonus) {

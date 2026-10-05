@@ -1,4 +1,5 @@
 #include "Weapon.h"
+#include <iostream>
 #include <fstream>
 #include <stdexcept>
 #include <nlohmann/json.hpp>
@@ -17,7 +18,7 @@ static const json& weapon_data() {
     return data;
 }
 Weapon::Weapon(WeaponType wt) : type(wt) {
-    const json& w = weapon_data().at(Type_to_string());
+    const json& w = weapon_data().at(Type_to_string(wt));
     health_bonus = w.at("HealthBonus");
     attack_bonus = w.at("AttackBonus");
     armor_bonus = w.at("ArmorBonus");
@@ -53,6 +54,30 @@ string Weapon::Type_to_string(WeaponType wt) const {
     default: return "Unknown";
     }
 }
+// static: it doesn't need a Weapon object, so it can be called before one exists
+Weapon::WeaponType Weapon::string_to_type(const string& name) {
+    if (name == "Sword") return WeaponType::Sword;
+    if (name == "Greatsword") return WeaponType::Greatsword;
+    if (name == "Dagger") return WeaponType::Dagger;
+    if (name == "Spear") return WeaponType::Spear;
+    if (name == "Axe") return WeaponType::Axe;
+    if (name == "Mace") return WeaponType::Mace;
+    if (name == "Greataxe") return WeaponType::Greataxe;
+    if (name == "Katana") return WeaponType::Katana;
+    if (name == "Twinblade") return WeaponType::Twinblade;
+    if (name == "Saber") return WeaponType::Saber;
+    throw runtime_error("Unknown weapon name: " + name);
+}
+string Weapon::get_name() const {
+    return Type_to_string(type);
+}
+void Weapon::display_stats() const {
+    cout << "  Weapon: " << get_name() << endl;
+    cout << "  Health Bonus: " << health_bonus << endl;
+    cout << "  Attack Bonus: " << attack_bonus << endl;
+    cout << "  Armor Bonus: " << armor_bonus << endl;
+    cout << "  Dodge Bonus: " << dodge_bonus << endl;
+}
 void Weapon::setHealthBonus(int bonus) {
     health_bonus = bonus;
 }
@@ -64,11 +89,4 @@ void Weapon::setArmorBonus(int bonus) {
 }
 void Weapon::setDodgeBonus(int bonus) {
     dodge_bonus = bonus;
-}
-void Weapon::display_stats() const {
-    cout << "Weapon Type: " << Type_to_string(type) << endl;
-    cout << "Health Bonus: " << health_bonus << endl;
-    cout << "Attack Bonus: " << attack_bonus << endl;
-    cout << "Armor Bonus: " << armor_bonus << endl;
-    cout << "Dodge Bonus: " << dodge_bonus << endl;
 }
