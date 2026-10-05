@@ -1,0 +1,14 @@
+{
+    "Small_Health_potion":{
+        "HealthBonus":20,
+        "AttackBonus":0,
+        "ArmorBonus":0,
+        "DodgeBonus":0
+    },
+    "Small_Defense_potion":{
+        "HealthBonus":0,
+        "AttackBonus":0,
+        "ArmorBonus":20,
+        "DodgeBonus":0
+    }
+}
