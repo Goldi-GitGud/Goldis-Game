@@ -1,0 +1,14 @@
+{
+    "Sword":{
+        "HealthBonus":20,
+        "AttackBonus":30,
+        "ArmorBonus":5,
+        "DodgeBonus":3
+    },
+    "Greatsword":{
+        "HealthBonus":15,
+        "AttackBonus":40,
+        "ArmorBonus":10,
+        "DodgeBonus":1
+    }
+}
