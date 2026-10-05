@@ -10,5 +10,65 @@
         "AttackBonus":0,
         "ArmorBonus":20,
         "DodgeBonus":0
+    },
+    "Small_Dodge_potion":{
+        "HealthBonus":0,
+        "AttackBonus":0,
+        "ArmorBonus":0,
+        "DodgeBonus":5
+    },
+    "Small_Attack_potion":{
+        "HealthBonus":0,
+        "AttackBonus":10,
+        "ArmorBonus":0,
+        "DodgeBonus":0
+    },
+    "Medium_Health_potion":{
+        "HealthBonus":40,
+        "AttackBonus":0,
+        "ArmorBonus":0,
+        "DodgeBonus":0
+    },
+    "Medium_Defense_potion":{
+        "HealthBonus":0,
+        "AttackBonus":0,
+        "ArmorBonus":35,
+        "DodgeBonus":0
+    },
+    "Medium_Dodge_potion":{
+        "HealthBonus":0,
+        "AttackBonus":0,
+        "ArmorBonus":0,
+        "DodgeBonus":10
+    },
+    "Medium_Attack_potion":{
+        "HealthBonus":0,
+        "AttackBonus":20,
+        "ArmorBonus":0,
+        "DodgeBonus":0
+    },
+    "Large_Health_potion":{
+        "HealthBonus":70,
+        "AttackBonus":0,
+        "ArmorBonus":0,
+        "DodgeBonus":0
+    },
+    "Large_Defense_potion":{
+        "HealthBonus":0,
+        "AttackBonus":0,
+        "ArmorBonus":50,
+        "DodgeBonus":0
+    },
+    "Large_Dodge_potion":{
+        "HealthBonus":0,
+        "AttackBonus":0,
+        "ArmorBonus":0,
+        "DodgeBonus":20
+    },
+    "Large_Attack_potion":{
+        "HealthBonus":0,
+        "AttackBonus":35,
+        "ArmorBonus":0,
+        "DodgeBonus":0
     }
 }

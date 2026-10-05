@@ -1,4 +1,11 @@
 {
+    "Slime":{
+        "Hp":30,
+        "Attack":5,
+        "Armor":0,
+        "Dodge":0,
+        "MinLevel":1
+    },
     "Goblin":{
         "Hp":50,
         "Attack":10,
@@ -12,5 +19,75 @@
         "Armor":7,
         "Dodge":0,
         "MinLevel":1
+    },
+    "Orc":{
+        "Hp":90,
+        "Attack":18,
+        "Armor":6,
+        "Dodge":3,
+        "MinLevel":2
+    },
+    "Skeleton":{
+        "Hp":80,
+        "Attack":20,
+        "Armor":4,
+        "Dodge":8,
+        "MinLevel":3
+    },
+    "Troll":{
+        "Hp":140,
+        "Attack":26,
+        "Armor":10,
+        "Dodge":0,
+        "MinLevel":4
+    },
+    "Cyclop":{
+        "Hp":180,
+        "Attack":32,
+        "Armor":12,
+        "Dodge":2,
+        "MinLevel":5
+    },
+    "Dragon":{
+        "Hp":400,
+        "Attack":70,
+        "Armor":22,
+        "Dodge":5,
+        "MinLevel":12
+    },
+    "Lich":{
+        "Hp":160,
+        "Attack":46,
+        "Armor":10,
+        "Dodge":10,
+        "MinLevel":8
+    },
+    "Vampire":{
+        "Hp":150,
+        "Attack":36,
+        "Armor":8,
+        "Dodge":12,
+        "MinLevel":6
+    },
+    "Werewolf":{
+        "Hp":170,
+        "Attack":40,
+        "Armor":8,
+        "Dodge":15,
+        "MinLevel":7
+    },
+    "Demon":{
+        "Hp":220,
+        "Attack":52,
+        "Armor":14,
+        "Dodge":8,
+        "MinLevel":9
+    },
+    "Dullahan":{
+        "Hp":260,
+        "Attack":58,
+        "Armor":16,
+        "Dodge":10,
+        "MinLevel":10
     }
 }

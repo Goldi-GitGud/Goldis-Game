@@ -5,12 +5,24 @@
 #include <stdexcept>
 using namespace std;
 
-// Enemies that can appear in waves. The enum order is already sorted by level,
-// so add new types here only once they exist in Enemy_data.json
-// (constructing an Enemy whose entry is missing from the JSON will throw).
+// Every enemy that can appear in waves. Which ones actually spawn depends on the
+// player's level: spawn_wave only keeps enemies whose MinLevel in Enemy_data.json is
+// at or below it. Any type listed here must have an entry in Enemy_data.json,
+// otherwise constructing that Enemy will throw.
 static const vector<Enemy::EnemyType> spawn_pool = {
+    Enemy::EnemyType::Slime,
     Enemy::EnemyType::Goblin,
     Enemy::EnemyType::Zombie,
+    Enemy::EnemyType::Orc,
+    Enemy::EnemyType::Skeleton,
+    Enemy::EnemyType::Troll,
+    Enemy::EnemyType::Cyclop,
+    Enemy::EnemyType::Vampire,
+    Enemy::EnemyType::Werewolf,
+    Enemy::EnemyType::Lich,
+    Enemy::EnemyType::Demon,
+    Enemy::EnemyType::Dullahan,
+    Enemy::EnemyType::Dragon,
 };
 
 // Reads a whole number between min and max, asking again on bad input.
