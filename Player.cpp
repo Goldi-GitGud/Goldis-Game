@@ -166,6 +166,10 @@ void Player::gain_experience(int exp) {
 void Player::change_weapon(const Weapon& new_weapon) {
     weapon = new_weapon;
     cout << "You equipped a new weapon: " << weapon.get_name() << endl;
+    bonus_health = weapon.getHealthBonus();
+    bonus_attack_power = weapon.getAttackPowerBonus();
+    bonus_armor = weapon.getArmorBonus();
+    bonus_dodge_chance = weapon.getDodgeChanceBonus();
 }
 void Player::gain_gold(int amount) {
     gold += amount;
