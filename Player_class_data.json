@@ -1,16 +1,20 @@
 {
-    "Swordsman":{
+    "Warrior":{
         "Health":100,
         "Attack":10,
         "Armor":5,
         "Dodge":5,
-        "Weapon":"Sword"
+        "Weapon":"Sword",
+        "Level":3,
+        "Gold":600
     },
     "Knight":{
         "Health":130,
         "Attack":8,
         "Armor":10,
         "Dodge":2,
-        "Weapon":"Greatsword"
+        "Weapon":"Greatsword",
+        "Level":3,
+        "Gold":600
     }
 }

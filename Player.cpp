@@ -2,14 +2,38 @@
 #include "Enemy.h"
 #include "Utils.h"
 #include <iostream>
+#include <fstream>
+#include <stdexcept>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 using namespace std;
 
-Player::Player(int h, int ap, int a, int l, int exp, int g, int d, const Weapon& w)
-    : health(h), attack_power(ap), armor(a), level(l), experience(exp), gold(g), dodge_chance(d), weapon(w) {
-    bonus_health = 0;
-    bonus_attack_power = 0;
-    bonus_armor = 0;
-    bonus_dodge_chance = 0;
+static const json& player_data() {
+    static const json data = [] {
+        ifstream file("Player_data.json");
+        if (!file) throw runtime_error("Could not open Player_data.json");
+        json j;
+        file >> j;
+        return j;
+        }();
+    return data;
+}
+
+Player::Player(PlayerClass pc)
+    : type(pc) {
+    const json& p = player_data().at(Type_to_string());
+    health = p.at("Health");
+    attack_power = p.at("AttackPower");
+    armor = p.at("Armor");
+    dodge_chance = p.at("DodgeChance");
+    weapon = Weapon(static_cast<Weapon::WeaponType>(p.at("WeaponType")));
+    level = p.at("Level");
+    gold = p.at("Gold");
+    experience = 0;
+    bonus_health = weapon.getHealthBonus();
+    bonus_attack_power = weapon.getAttackPowerBonus();
+    bonus_armor = weapon.getArmorBonus();
+    bonus_dodge_chance = weapon.getDodgeChanceBonus();
 }
 
 Player::Player() // this will be the default stats for default player class
@@ -20,6 +44,9 @@ Player::Player() // this will be the default stats for default player class
     bonus_dodge_chance = 0;
 }
 
+PlayerClass Player::getType() const {
+    return type;
+}
 int Player::get_health() const {
     return health;
 }
@@ -55,6 +82,9 @@ int Player::get_gold() const {
 }
 const Weapon& Player::get_weapon() const {
     return weapon;
+}
+void Player::set_type(PlayerClass pc) {
+    type = pc;
 }
 void Player::set_health(int h) {
     health = h;
@@ -102,7 +132,6 @@ void Player::display_stats() const {
     cout << "Experience: " << experience << endl;
     cout << "Gold: " << gold << endl;
     cout << "Dodge Chance: " << dodge_chance << "%" << endl;
-    cout << "Equipped Weapon: " << weapon.get_name() << endl;
     cout << "Weapon Stats:" << endl;
     weapon.display_stats();
     cout << "____________________________________________" << endl;

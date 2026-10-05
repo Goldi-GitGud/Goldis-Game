@@ -5,7 +5,20 @@
 class Enemy; // Forward declaration of Enemy class
 
 class Player {
+public:
+    enum class PlayerClass {
+        Warrior,
+        Knight,
+        Rogue,
+        Paladin,
+        Berserker,
+        Monk,
+        Assassin,
+        Duelist,
+        Hunter
+    };
 private:
+    PlayerClass type;
     int health;
     int bonus_health;
     int attack_power;
@@ -20,8 +33,8 @@ private:
     Weapon weapon;
 
 public:
-    Player(int h, int ap, int a, int l, int exp, int g, int d, const Weapon& w);
-    Player();
+    explicit Player(PlayerClass pc);
+    PlayerClass getType() const;
     int get_health() const;
     int get_bonus_health() const;
     int get_attack_power() const;
@@ -34,6 +47,7 @@ public:
     int get_experience() const;
     int get_gold() const;
     const Weapon& get_weapon() const;
+    void set_type(PlayerClass pc);
     void set_health(int h);
     void set_bonus_health(int bh);
     void set_attack_power(int ap);
@@ -46,7 +60,7 @@ public:
     void set_experience(int exp);
     void set_gold(int g);
     void equip_weapon(const Weapon& w);
-    void display_stats() const;
+    void display_stats() const;// will display the stats of the player, including bonuses from weapon and items
 
     void attack_enemy(Enemy& enemy);
     void take_damage(int damage);

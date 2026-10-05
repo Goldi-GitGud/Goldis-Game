@@ -65,3 +65,10 @@ void Weapon::setArmorBonus(int bonus) {
 void Weapon::setDodgeBonus(int bonus) {
     dodge_bonus = bonus;
 }
+void Weapon::display_stats() const {
+    cout << "Weapon Type: " << Type_to_string(type) << endl;
+    cout << "Health Bonus: " << health_bonus << endl;
+    cout << "Attack Bonus: " << attack_bonus << endl;
+    cout << "Armor Bonus: " << armor_bonus << endl;
+    cout << "Dodge Bonus: " << dodge_bonus << endl;
+}

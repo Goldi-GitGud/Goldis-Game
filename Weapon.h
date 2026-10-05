@@ -33,4 +33,5 @@ public:
     void setAttackBonus(int bonus);
     void setArmorBonus(int bonus);
     void setDodgeBonus(int bonus);
+    void display_stats() const;
 };
