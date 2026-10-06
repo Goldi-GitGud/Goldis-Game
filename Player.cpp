@@ -19,7 +19,7 @@ static const json& player_data() {
     return data;
 }
 
-// These two are free functions (not Player members) so the constructor can use them
+// These two are free functions so the constructor can use them
 // in its initializer list, before the Player object is fully built.
 static string class_name(Player::PlayerClass pc) {
     switch (pc) {
@@ -39,8 +39,8 @@ static const json& player_entry(Player::PlayerClass pc) {
     return player_data().at(class_name(pc));
 }
 
-// Weapon has no default constructor, so it has to be built in the initializer list
-// (the part after the colon), before the constructor body runs.
+// we needed the above functions to get player stats to know which weapon to construct
+// we needed to construct the weapon first so we can get its bonuses to add to the player's bonus stats in the body of the constructor
 Player::Player(PlayerClass pc)
     : type(pc),
       weapon(Weapon::string_to_type(player_entry(pc).at("WeaponType").get<string>())) {
@@ -180,7 +180,6 @@ void Player::gain_experience(int exp) {
         gain_level();
     }
 }
-// Swaps the old weapon's bonuses for the new weapon's, so potion boosts on top of them are kept.
 void Player::change_weapon(const Weapon& new_weapon) {
     bonus_health -= weapon.getHealthBonus();
     bonus_attack_power -= weapon.getAttackBonus();
@@ -193,7 +192,6 @@ void Player::change_weapon(const Weapon& new_weapon) {
     bonus_armor += weapon.getArmorBonus();
     bonus_dodge_chance += weapon.getDodgeBonus();
 }
-// Potions add to the bonus stats, so resetting them to just the weapon's bonuses removes the potion boosts.
 void Player::clear_temporary_effects() {
     bonus_health = weapon.getHealthBonus();
     bonus_attack_power = weapon.getAttackBonus();

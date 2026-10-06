@@ -62,7 +62,7 @@ public:
     void set_experience(int exp);
     void set_gold(int g);
     void equip_weapon(const Weapon& w);
-    void display_stats() const;// will display the stats of the player, including bonuses from weapon and items
+    void display_stats() const;
 
     void attack_enemy(Enemy& enemy);
     void take_damage(int damage);

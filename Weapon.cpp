@@ -54,7 +54,7 @@ string Weapon::Type_to_string(WeaponType wt) const {
     default: return "Unknown";
     }
 }
-// static: it doesn't need a Weapon object, so it can be called before one exists
+// is static so it can be called without a Weapon object, used by Player constructor to build the weapon from JSON
 Weapon::WeaponType Weapon::string_to_type(const string& name) {
     if (name == "Sword") return WeaponType::Sword;
     if (name == "Greatsword") return WeaponType::Greatsword;

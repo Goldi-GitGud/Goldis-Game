@@ -29,7 +29,7 @@ public:
     int getArmorBonus() const;
     int getDodgeBonus() const;
     std::string Type_to_string(WeaponType wt) const;
-    static WeaponType string_to_type(const std::string& name); // "Sword" -> WeaponType::Sword (used by JSON loading)
+    static WeaponType string_to_type(const std::string& name);
     std::string get_name() const;
     void display_stats() const;
     void setHealthBonus(int bonus);
