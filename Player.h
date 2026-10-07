@@ -37,6 +37,9 @@ public:
     explicit Player(PlayerClass pc);
     PlayerClass getType() const;
     std::string Type_to_string() const;
+    // static = can be used without a Player object, e.g. Player::class_to_string(Player::PlayerClass::Rogue)
+    static std::string class_to_string(PlayerClass pc);
+    static PlayerClass string_to_class(const std::string& name); // used when loading saves
     int get_health() const;
     int get_bonus_health() const;
     int get_attack_power() const;
@@ -62,7 +65,7 @@ public:
     void set_experience(int exp);
     void set_gold(int g);
     void equip_weapon(const Weapon& w);
-    void display_stats() const;
+    void display_stats() const;// will display the stats of the player, including bonuses from weapon and items
 
     void attack_enemy(Enemy& enemy);
     void take_damage(int damage);

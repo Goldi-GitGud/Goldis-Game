@@ -13,5 +13,8 @@ public:
     void addWeapon(const Weapon& weapon);
     void removeItem(const Item& item);
     void removeWeapon(const Weapon& weapon);
+    // Read-only views of what's inside, so Combat (use item) and Manager (saving) can look without being able to change it.
+    const std::vector<Item>& getItems() const;
+    const std::vector<Weapon>& getWeapons() const;
     void displayContents() const;
 };

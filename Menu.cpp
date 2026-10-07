@@ -1,17 +1,18 @@
-#include<Menu.h>
-#include<iostream>
+#include "Menu.h"
+#include "Utils.h"
+#include <iostream>
+using namespace std;
 
 void Menu::display_menu() {
-    while (true) {
+    while (running) {
         cout << "Welcome to Goldi's Game!" << endl;
         cout << "___________________________________________" << endl;
         cout << "1. Start Game" << endl;
         cout << "2. Options" << endl;
-        cout << "3.Exit" << endl;
+        cout << "3. Exit" << endl;
         cout << "___________________________________________" << endl;
         cout << "Enter your choice: ";
-        int choice;
-        cin >> choice;
+        int choice = read_choice(1, 3);
         switch (choice)
         {
         case 1:
@@ -23,15 +24,12 @@ void Menu::display_menu() {
         case 3:
             launch_exit(0);
             break;
-        default:
-            launch_exit(1);
-            break;
         }
     }
 }
 
 void Menu::launch_game() {
-    while (true) {
+    while (running) {
         cout << "Welcome to the Game Menu!" << endl;
         cout << "____________________________________________" << endl;
         cout << "1. New Game" << endl;
@@ -39,27 +37,49 @@ void Menu::launch_game() {
         cout << "3. Return to Main Menu" << endl;
         cout << "___________________________________________" << endl;
         cout << "Enter your choice: ";
-        int choice;cin >> choice;
+        int choice = read_choice(1, 3);
         switch (choice)
         {
-        case 1:
-            difficulty(2);
+        case 1: {
+            Player::PlayerClass chosen_class;
+            if (!choose_class(chosen_class)) break;
+            if (!difficulty()) break;
+            game.new_game(chosen_class);
+            cout << "Starting Game..." << endl;
+            play();
             break;
-        case 2:
-            manager.load_game_saves();
+        }
+        case 2: {
+            int slot = choose_slot("Load which save?");
+            if (slot != 0 && manager.load_game_saves(game, slot)) {
+                play();
+            }
             break;
+        }
         case 3:
             return;
-            break;
-        default:
-            cout << "Invalid choice. Returning to main menu." << endl;
+        }
+        // "Return to Main Menu" from the pause menu ends up here
+        if (leave_to_main) {
+            leave_to_main = false;
             return;
-            break;
         }
     }
 }
 
-void Menu::launch_pause() {
+// Runs the game. Every time it pauses, the pause menu decides whether to resume or leave.
+// When the player dies the game prints its own "GAME OVER" summary and we just return.
+void Menu::play() {
+    Game::Result result = game.run();
+    while (result == Game::Result::Paused) {
+        if (!launch_pause()) {
+            return;
+        }
+        result = game.run();
+    }
+}
+
+bool Menu::launch_pause() {
     while (true) {
         cout << "____________________________________________" << endl;
         cout << "1. Resume Game" << endl;
@@ -69,32 +89,27 @@ void Menu::launch_pause() {
         cout << "5. Exit Game" << endl;
         cout << "___________________________________________" << endl;
         cout << "Enter your choice: ";
-        int choice;cin >> choice;
+        int choice = read_choice(1, 5);
         switch (choice)
         {
         case 1:
-            game.resume_game();
+            return true;
+        case 2: {
+            int slot = choose_slot("Save to which slot?");
+            if (slot != 0) manager.save_game_saves(game, slot);
             break;
-        case 2:
-            manager.save_game_saves();
-            break;
+        }
         case 3:
-            difficulty(4);
+            difficulty();
             break;
         case 4:
-            cout << "Saving game before returning to main menu..." << endl;
-            manager.save_game_saves();
-            display_menu();
-            break;
+            offer_save();
+            leave_to_main = true;
+            return false;
         case 5:
-            cout << "Saving game before exiting..." << endl;
-            manager.save_game_saves();
+            offer_save();
             launch_exit(0);
-            break;
-        default:
-            cout << "Invalid choice. Resuming game." << endl;
-            game.resume_game();
-            break;
+            return false;
         }
     }
 }
@@ -106,84 +121,90 @@ void Menu::launch_options() {
         cout << "2. Return to Main Menu" << endl;
         cout << "____________________________________________" << endl;
         cout << "Enter your choice: ";
-        int choice;cin >> choice;
+        int choice = read_choice(1, 2);
         switch (choice)
         {
         case 1:
-            difficulty(1);
+            difficulty();
             break;
         case 2:
             return;
-            break;
-        default:
-            cout << "Invalid choice. Returning to main menu." << endl;
-            return;
-            break;
         }
     }
-
 }
 
 void Menu::launch_exit(int code) {
     if (code == 0) {
         cout << "Thank you for playing the game!" << endl;
-        return;
     }
     else {
         cout << "Invalid choice. Exiting the program." << endl;
-        return;
     }
+    running = false;
 }
 
-void Menu::difficulty(int loc) {
-    while (true) {
-        cout << "____________________________________________" << endl;
-        cout << "Current difficulty level: " << game.get_difficulty() << endl;;
-        cout << " choose difficulty level: " << endl;
-        cout << "1. Easy (The enemies are weaker and you are a bit more stronger)" << endl;
-        cout << "2. Normal (Balanced difficulty , recommended for most players)" << endl;
-        cout << "3. Hard (The enemies are significantly stronger , recommended for experienced players)" << endl;
-        cout << "4. Return to Previous Menu" << endl;
-        cout << "Note: This will affect all saves and can be changed from the options menu." << endl;
-        cout << "____________________________________________" << endl;
-        cout << "Enter your choice: ";
-        int choice;
-        cin >> choice;
-        switch (choice) {
-        case 1:
-            game.set_difficulty(1);
-            cout << "Difficulty level set to Easy." << endl;
-            if (loc == 2)loc = 3;
-            break;
-        case 2:
-            game.set_difficulty(2);
-            cout << "Difficulty level set to Normal." << endl;
-            if (loc == 2)loc = 3;
-            break;
-        case 3:
-            game.set_difficulty(3);
-            cout << "Difficulty level set to Hard." << endl;
-            if (loc == 2)loc = 3;
-            break;
-        default:
-            cout << "Invalid choice." << endl;
-            break;
-        }
-        if (loc == 1) {
-            cout << "Returning to main menu" << endl;
-            display_menu();
-        }
-        else if (loc == 2) {
-            cout << "Returning to game menu" << endl;
-            launch_game();
-        }
-        else if (loc == 3) {
-            cout << "Starting Game..." << endl;
-            game.start_game();
-        }
-        else {
-            cout << "Returning to pause menu" << endl;
-            launch_pause();
-        }
+bool Menu::difficulty() {
+    cout << "____________________________________________" << endl;
+    cout << "Current difficulty level: " << game.get_difficulty_name() << endl;
+    cout << " choose difficulty level: " << endl;
+    cout << "1. Easy (The enemies are weaker and you are a bit more stronger)" << endl;
+    cout << "2. Normal (Balanced difficulty , recommended for most players)" << endl;
+    cout << "3. Hard (The enemies are significantly stronger , recommended for experienced players)" << endl;
+    cout << "4. Return to Previous Menu" << endl;
+    cout << "Note: This will affect all saves and can be changed from the options menu." << endl;
+    cout << "____________________________________________" << endl;
+    cout << "Enter your choice: ";
+    int choice = read_choice(1, 4);
+    if (choice == 4) {
+        return false;
+    }
+    game.set_difficulty(choice);
+    cout << "Difficulty level set to " << game.get_difficulty_name() << "." << endl;
+    return true;
+}
+
+// ---- helpers ----
+
+bool Menu::choose_class(Player::PlayerClass& chosen) {
+    const int class_count = static_cast<int>(Player::PlayerClass::Hunter) + 1; // Hunter is the last class in the enum
+    cout << "____________________________________________" << endl;
+    cout << "Choose your class:" << endl;
+    for (int i = 0; i < class_count; i++) {
+        Player::PlayerClass pc = static_cast<Player::PlayerClass>(i);
+        Player preview(pc); // loads the class's stats from Player_data.json just to show them
+        cout << i + 1 << ". " << Player::class_to_string(pc)
+             << "  (HP " << preview.get_health() << ", Attack " << preview.get_attack_power()
+             << ", Armor " << preview.get_armor() << ", Dodge " << preview.get_dodge_chance()
+             << "%, Weapon: " << preview.get_weapon().get_name() << ")" << endl;
+    }
+    cout << "0. Back" << endl;
+    cout << "Enter your choice: ";
+    int choice = read_choice(0, class_count);
+    if (choice == 0) {
+        return false;
+    }
+    chosen = static_cast<Player::PlayerClass>(choice - 1);
+    return true;
+}
+
+int Menu::choose_slot(const string& title) {
+    cout << "____________________________________________" << endl;
+    cout << title << endl;
+    for (int slot = 1; slot <= Manager::SLOT_COUNT; slot++) {
+        cout << slot << ". Slot " << slot << ": " << manager.describe_slot(slot) << endl;
+    }
+    cout << "0. Back" << endl;
+    cout << "Enter your choice: ";
+    return read_choice(0, Manager::SLOT_COUNT);
+}
+
+void Menu::offer_save() {
+    cout << "Save before leaving?" << endl;
+    cout << "1. Yes" << endl;
+    cout << "2. No" << endl;
+    cout << "Enter your choice: ";
+    if (read_choice(1, 2) == 1) {
+        int slot = choose_slot("Save to which slot?");
+        if (slot != 0) manager.save_game_saves(game, slot);
     }
 }

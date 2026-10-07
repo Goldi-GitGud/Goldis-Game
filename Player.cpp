@@ -19,28 +19,39 @@ static const json& player_data() {
     return data;
 }
 
-// These two are free functions so the constructor can use them
-// in its initializer list, before the Player object is fully built.
-static string class_name(Player::PlayerClass pc) {
+string Player::class_to_string(PlayerClass pc) {
     switch (pc) {
-    case Player::PlayerClass::Warrior: return "Warrior";
-    case Player::PlayerClass::Knight: return "Knight";
-    case Player::PlayerClass::Rogue: return "Rogue";
-    case Player::PlayerClass::Paladin: return "Paladin";
-    case Player::PlayerClass::Berserker: return "Berserker";
-    case Player::PlayerClass::Monk: return "Monk";
-    case Player::PlayerClass::Assassin: return "Assassin";
-    case Player::PlayerClass::Duelist: return "Duelist";
-    case Player::PlayerClass::Hunter: return "Hunter";
+    case PlayerClass::Warrior: return "Warrior";
+    case PlayerClass::Knight: return "Knight";
+    case PlayerClass::Rogue: return "Rogue";
+    case PlayerClass::Paladin: return "Paladin";
+    case PlayerClass::Berserker: return "Berserker";
+    case PlayerClass::Monk: return "Monk";
+    case PlayerClass::Assassin: return "Assassin";
+    case PlayerClass::Duelist: return "Duelist";
+    case PlayerClass::Hunter: return "Hunter";
     default: return "Unknown";
     }
 }
+Player::PlayerClass Player::string_to_class(const string& name) {
+    if (name == "Warrior") return PlayerClass::Warrior;
+    if (name == "Knight") return PlayerClass::Knight;
+    if (name == "Rogue") return PlayerClass::Rogue;
+    if (name == "Paladin") return PlayerClass::Paladin;
+    if (name == "Berserker") return PlayerClass::Berserker;
+    if (name == "Monk") return PlayerClass::Monk;
+    if (name == "Assassin") return PlayerClass::Assassin;
+    if (name == "Duelist") return PlayerClass::Duelist;
+    if (name == "Hunter") return PlayerClass::Hunter;
+    throw runtime_error("Unknown player class: " + name);
+}
+// A free function so the constructor can use it in its initializer list.
 static const json& player_entry(Player::PlayerClass pc) {
-    return player_data().at(class_name(pc));
+    return player_data().at(Player::class_to_string(pc));
 }
 
-// we needed the above functions to get player stats to know which weapon to construct
-// we needed to construct the weapon first so we can get its bonuses to add to the player's bonus stats in the body of the constructor
+// Weapon has no default constructor, so it has to be built in the initializer list
+// (the part after the colon), before the constructor body runs.
 Player::Player(PlayerClass pc)
     : type(pc),
       weapon(Weapon::string_to_type(player_entry(pc).at("WeaponType").get<string>())) {
@@ -62,7 +73,7 @@ Player::PlayerClass Player::getType() const {
     return type;
 }
 string Player::Type_to_string() const {
-    return class_name(type);
+    return class_to_string(type);
 }
 int Player::get_health() const {
     return health;
@@ -180,6 +191,7 @@ void Player::gain_experience(int exp) {
         gain_level();
     }
 }
+// Swaps the old weapon's bonuses for the new weapon's, so potion boosts on top of them are kept.
 void Player::change_weapon(const Weapon& new_weapon) {
     bonus_health -= weapon.getHealthBonus();
     bonus_attack_power -= weapon.getAttackBonus();
@@ -192,6 +204,7 @@ void Player::change_weapon(const Weapon& new_weapon) {
     bonus_armor += weapon.getArmorBonus();
     bonus_dodge_chance += weapon.getDodgeBonus();
 }
+// Potions add to the bonus stats, so resetting them to just the weapon's bonuses removes the potion boosts.
 void Player::clear_temporary_effects() {
     bonus_health = weapon.getHealthBonus();
     bonus_attack_power = weapon.getAttackBonus();

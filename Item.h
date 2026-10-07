@@ -34,6 +34,9 @@ public:
     int getDodgeBonus() const;
     std::string Type_to_string(ItemType it) const;
     std::string get_name() const;
+    static ItemType string_to_type(const std::string& name); // "Small_Health_potion" -> enum (used when loading saves)
+    // Health heals right away. Attack/armor/dodge go into the player's bonus stats
+    // and last until Player::clear_temporary_effects() (called when a wave ends).
     void apply_effect(Player& player) const;
     void setHealthBonus(int bonus);
     void setAttackBonus(int bonus);

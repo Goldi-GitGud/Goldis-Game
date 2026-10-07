@@ -60,6 +60,21 @@ string Item::Type_to_string(ItemType it) const {
 string Item::get_name() const {
     return Type_to_string(type);
 }
+Item::ItemType Item::string_to_type(const string& name) {
+    if (name == "Small_Health_potion") return ItemType::Small_Health_potion;
+    if (name == "Small_Defense_potion") return ItemType::Small_Defense_potion;
+    if (name == "Small_Dodge_potion") return ItemType::Small_Dodge_potion;
+    if (name == "Small_Attack_potion") return ItemType::Small_Attack_potion;
+    if (name == "Medium_Health_potion") return ItemType::Medium_Health_potion;
+    if (name == "Medium_Defense_potion") return ItemType::Medium_Defense_potion;
+    if (name == "Medium_Dodge_potion") return ItemType::Medium_Dodge_potion;
+    if (name == "Medium_Attack_potion") return ItemType::Medium_Attack_potion;
+    if (name == "Large_Health_potion") return ItemType::Large_Health_potion;
+    if (name == "Large_Defense_potion") return ItemType::Large_Defense_potion;
+    if (name == "Large_Dodge_potion") return ItemType::Large_Dodge_potion;
+    if (name == "Large_Attack_potion") return ItemType::Large_Attack_potion;
+    throw runtime_error("Unknown item name: " + name);
+}
 void Item::apply_effect(Player& player) const {
     if (health_bonus > 0) {
         player.heal(health_bonus);

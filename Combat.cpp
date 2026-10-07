@@ -1,8 +1,6 @@
 #include "Combat.h"
 #include "Utils.h"
 #include <iostream>
-#include <limits>
-#include <stdexcept>
 using namespace std;
 
 // Every enemy that can appear in waves. Which ones actually spawn depends on the
@@ -25,27 +23,22 @@ static const vector<Enemy::EnemyType> spawn_pool = {
     Enemy::EnemyType::Dragon,
 };
 
-// Reads a whole number between min and max, asking again on bad input.
-static int read_choice(int min, int max) {
-    while (true) {
-        int choice;
-        if (cin >> choice && choice >= min && choice <= max) {
-            return choice;
-        }
-        if (cin.eof()) {
-            throw runtime_error("Input closed");
-        }
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "Please enter a number from " << min << " to " << max << ": ";
-    }
+// Placeholder: how strong enemies are on each difficulty, as a percentage of their JSON stats.
+static int difficulty_percent(int difficulty) {
+    if (difficulty == 1) return 80;   // easy
+    if (difficulty == 3) return 130;  // hard
+    return 100;                       // normal
 }
 
-Combat::Combat(Player& p) : player(p) {}
+Combat::Combat(Player& p, Bag& b) : player(p), bag(b), wave_active(false) {}
+
+bool Combat::is_wave_active() const {
+    return wave_active;
+}
 
 // ---- wave setup ----
 
-void Combat::spawn_wave(int wave_number) {
+void Combat::spawn_wave(int wave_number, int difficulty) {
     enemies.clear();
 
     // placeholder scaling: wave 1 -> 1 enemy, wave 2 -> 2, wave 4 -> 3 ... capped at 5
@@ -63,9 +56,13 @@ void Combat::spawn_wave(int wave_number) {
         eligible.push_back(spawn_pool.front());
     }
 
+    int percent = difficulty_percent(difficulty);
     for (int i = 0; i < count; i++) {
         int index = random_int(0, static_cast<int>(eligible.size()) - 1);
-        enemies.push_back(Enemy(eligible[index]));
+        Enemy enemy(eligible[index]);
+        enemy.set_health(enemy.get_health() * percent / 100);
+        enemy.set_attack_power(enemy.get_attack_power() * percent / 100);
+        enemies.push_back(enemy);
     }
 }
 
@@ -118,14 +115,40 @@ void Combat::reward_for(const Enemy& enemy) {
     player.gain_gold(enemy.get_gold_reward());
 }
 
+// ---- items ----
+
+bool Combat::use_item_menu() {
+    const vector<Item>& items = bag.getItems();
+    if (items.empty()) {
+        cout << "Your bag has no items." << endl;
+        return false;
+    }
+    cout << "Items:" << endl;
+    for (size_t i = 0; i < items.size(); i++) {
+        cout << "  " << i + 1 << ". " << items[i].get_name() << endl;
+    }
+    cout << "  0. Back" << endl;
+    cout << "Choose an item: ";
+    int choice = read_choice(0, static_cast<int>(items.size()));
+    if (choice == 0) return false;
+
+    // Copy the item first: removing it from the bag would invalidate a reference into the bag.
+    Item chosen = items[choice - 1];
+    player.use_item(chosen);
+    bag.removeItem(chosen);
+    return true;
+}
+
 // ---- turns ----
 
-void Combat::player_turn() {
+Combat::TurnResult Combat::player_turn() {
     while (true) {
         cout << "1. Attack" << endl;
-        cout << "2. View my stats" << endl;
+        cout << "2. Use item" << endl;
+        cout << "3. View my stats" << endl;
+        cout << "4. Pause" << endl;
         cout << "Enter your choice: ";
-        int choice = read_choice(1, 2);
+        int choice = read_choice(1, 4);
 
         if (choice == 1) {
             int target = pick_target();
@@ -133,9 +156,20 @@ void Combat::player_turn() {
             if (!enemies[target].is_alive()) {
                 reward_for(enemies[target]);
             }
-            return; // attacking ends the turn
+            return TurnResult::Acted; // attacking ends the turn
         }
-        player.display_stats(); // viewing stats is free, so ask again
+        if (choice == 2) {
+            if (use_item_menu()) {
+                return TurnResult::Acted; // using an item ends the turn too
+            }
+            // backed out or bag empty: the turn isn't used, ask again
+        }
+        else if (choice == 3) {
+            player.display_stats(); // viewing stats is free, so ask again
+        }
+        else {
+            return TurnResult::Paused;
+        }
     }
 }
 
@@ -150,24 +184,33 @@ void Combat::enemies_turn() {
 
 // ---- main loop ----
 
-bool Combat::run_wave(int wave_number) {
-    spawn_wave(wave_number);
-    cout << endl << "=== Wave " << wave_number << " ===" << endl;
+Combat::Result Combat::fight(int wave_number, int difficulty) {
+    if (!wave_active) {
+        spawn_wave(wave_number, difficulty);
+        wave_active = true;
+        cout << endl << "=== Wave " << wave_number << " ===" << endl;
+    }
+    else {
+        cout << endl << "=== Wave " << wave_number << " (continued) ===" << endl;
+    }
 
     while (player.is_alive() && any_enemy_alive()) {
         show_status();
-        player_turn();
+        if (player_turn() == TurnResult::Paused) {
+            return Result::Paused; // enemies stay as they are until the player comes back
+        }
         if (any_enemy_alive()) {
             enemies_turn();
         }
     }
 
+    wave_active = false;
     player.clear_temporary_effects(); // potion boosts only last for one wave
 
     if (!player.is_alive()) {
         cout << "You were defeated on wave " << wave_number << "." << endl;
-        return false;
+        return Result::PlayerDied;
     }
     cout << "Wave " << wave_number << " cleared!" << endl;
-    return true;
+    return Result::Cleared;
 }

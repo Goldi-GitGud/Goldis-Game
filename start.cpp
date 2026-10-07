@@ -1,27 +1,18 @@
-#include<iostream>
+#include <iostream>
+#include <exception>
+#include "Menu.h"
 using namespace std;
-
-class Game {
-
-}
-
-class Manager {
-
-}
-
 
 int main()
 {
-    Menu menu;
-    Player player;
-    Enemy enemy;// enemy classes will be a json file
-    Weapon weapon;
-    Item item;
-    Bag bag;//for carrying items/weapons
-    // Player_class player_class; this will be a json file
-    Combat combat;
-    Game game;
-    Manager manager;
-    menu.display_menu();
+    try {
+        Menu menu; // the menu owns the Game and the Manager, and the Game owns the Player, Bag and Combat
+        menu.display_menu();
+    }
+    catch (const exception& e) {
+        // Most likely a data file (Player_data.json, Enemy_data.json ...) was not found next to where the program runs
+        cout << "The game stopped because of an error: " << e.what() << endl;
+        return 1;
+    }
     return 0;
 }
