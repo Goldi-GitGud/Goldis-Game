@@ -21,6 +21,7 @@ public:
 private:
     PlayerClass type;
     int health;
+    int max_health; // base max HP; effective cap is max_health + bonus_health
     int bonus_health;
     int attack_power;
     int bonus_attack_power;
@@ -41,6 +42,8 @@ public:
     static std::string class_to_string(PlayerClass pc);
     static PlayerClass string_to_class(const std::string& name); // used when loading saves
     int get_health() const;
+    int get_max_health() const; // base max HP (without bonuses)
+    int get_effective_max_health() const; // max_health + bonus_health, floored at 1
     int get_bonus_health() const;
     int get_attack_power() const;
     int get_bonus_attack_power() const;
@@ -54,6 +57,7 @@ public:
     const Weapon& get_weapon() const;
     void set_type(PlayerClass pc);
     void set_health(int h);
+    void set_max_health(int mh);
     void set_bonus_health(int bh);
     void set_attack_power(int ap);
     void set_bonus_attack_power(int bap);
@@ -77,6 +81,9 @@ public:
     void lose_experience(int amount);
     void player_death();
     void gain_level();
+    // XP needed to advance FROM the given level (stepped curve, see Player.cpp).
+    static int experience_to_next_level(int level);
+    static constexpr int MAX_LEVEL = 20;
     void use_item(const Item& item);
     void heal(int amount);
     void increase_attack_power(int amount);

@@ -1,6 +1,7 @@
 {
     "Warrior":{
         "Health":100,
+        "MaxHealth":100,
         "AttackPower":10,
         "Armor":5,
         "DodgeChance":5,
@@ -10,6 +11,7 @@
     },
     "Knight":{
         "Health":130,
+        "MaxHealth":130,
         "AttackPower":8,
         "Armor":10,
         "DodgeChance":2,
@@ -19,6 +21,7 @@
     },
     "Rogue":{
         "Health":80,
+        "MaxHealth":80,
         "AttackPower":12,
         "Armor":2,
         "DodgeChance":15,
@@ -28,6 +31,7 @@
     },
     "Paladin":{
         "Health":120,
+        "MaxHealth":120,
         "AttackPower":9,
         "Armor":8,
         "DodgeChance":3,
@@ -37,6 +41,7 @@
     },
     "Berserker":{
         "Health":110,
+        "MaxHealth":110,
         "AttackPower":14,
         "Armor":3,
         "DodgeChance":4,
@@ -46,6 +51,7 @@
     },
     "Monk":{
         "Health":95,
+        "MaxHealth":95,
         "AttackPower":11,
         "Armor":4,
         "DodgeChance":12,
@@ -55,6 +61,7 @@
     },
     "Assassin":{
         "Health":75,
+        "MaxHealth":75,
         "AttackPower":13,
         "Armor":2,
         "DodgeChance":18,
@@ -64,6 +71,7 @@
     },
     "Duelist":{
         "Health":90,
+        "MaxHealth":90,
         "AttackPower":11,
         "Armor":4,
         "DodgeChance":14,
@@ -73,6 +81,7 @@
     },
     "Hunter":{
         "Health":90,
+        "MaxHealth":90,
         "AttackPower":11,
         "Armor":3,
         "DodgeChance":10,
