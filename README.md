@@ -1,21 +1,30 @@
 # Terminal RPG (Goldi's Game)
 
-## Build
+Layout: `src/` holds all sources (each class's `.h` + `.cpp` together,
+plus `start.cpp` and `json.hpp`); `data/` holds the `*_data.json` stat files.
+
+## Build (g++, current)
 
 Requires a C++17 compiler. From the `app/` directory:
 
 ```sh
-g++ -std=c++17 -o start.exe start.cpp Game.cpp Menu.cpp Manager.cpp Combat.cpp Player.cpp Enemy.cpp Item.cpp Weapon.cpp Bag.cpp Utils.cpp
+g++ -std=c++17 -o start.exe src/start.cpp src/Game.cpp src/Menu.cpp src/Manager.cpp src/Combat.cpp src/Player.cpp src/Enemy.cpp src/Item.cpp src/Weapon.cpp src/Bag.cpp src/Utils.cpp
 ```
 
 ## Run
 
-You MUST run from the `app/` directory (all JSON paths — `Player_data.json`,
-`Enemy_data.json`, `Item_data.json`, `Weapon_data.json`, `save_slot_N.json` —
-are relative to the working directory):
+You MUST run from the `app/` directory (data paths `data/*_data.json` and
+runtime saves `save_slot_N.json` are relative to the working directory):
 
 ```sh
 ./start.exe        # Windows: start.exe
 ```
+
+## Next: CMake
+
+This layout is CMake-ready: one `add_executable` over `src/*.cpp` with
+`target_include_directories(... src)`, plus copying `data/` next to the
+binary (or setting the run working directory to `app/`). Saves stay in the
+working directory and are git-ignored (`save_slot_*.json`).
 
 See `DESIGN.md` for scope decisions and `GAME_STATUS.md` for the task plan.

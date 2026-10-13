@@ -10,8 +10,8 @@ using namespace std;
 
 static const json& player_data() {
     static const json data = [] {
-        ifstream file("Player_data.json");
-        if (!file) throw runtime_error("Could not open Player_data.json");
+        ifstream file("data/Player_data.json");
+        if (!file) throw runtime_error("Could not open data/Player_data.json");
         json j;
         file >> j;
         return j;

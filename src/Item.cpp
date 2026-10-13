@@ -15,8 +15,8 @@ using namespace std;
 // (HP 20/40/70, Atk 10/20/35, Armor 20/35/50, Dodge 5/10/20).
 static const json& item_data() {
     static const json data = [] {
-        ifstream file("Item_data.json");
-        if (!file) throw runtime_error("Could not open Item_data.json");
+        ifstream file("data/Item_data.json");
+        if (!file) throw runtime_error("Could not open data/Item_data.json");
         json j;
         try {
             file >> j;

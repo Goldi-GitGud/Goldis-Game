@@ -11,8 +11,8 @@ using namespace std;
 
 static const json& enemy_data() {
     static const json data = [] {
-        ifstream file("Enemy_data.json");
-        if (!file) throw runtime_error("Could not open Enemy_data.json");
+        ifstream file("data/Enemy_data.json");
+        if (!file) throw runtime_error("Could not open data/Enemy_data.json");
         json j;
         file >> j;
         return j;

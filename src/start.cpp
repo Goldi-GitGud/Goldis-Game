@@ -10,7 +10,7 @@ int main()
         menu.display_menu();
     }
     catch (const exception& e) {
-        // Most likely a data file (Player_data.json, Enemy_data.json ...) was not found next to where the program runs
+        // Most likely a data file (data/*_data.json) was not found relative to where the program runs
         cout << "The game stopped because of an error: " << e.what() << endl;
         return 1;
     }

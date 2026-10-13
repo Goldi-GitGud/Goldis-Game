@@ -13,8 +13,8 @@ using namespace std;
 // Greatsword/Greataxe (heavy, top attack).
 static const json& weapon_data() {
     static const json data = [] {
-        ifstream file("Weapon_data.json");
-        if (!file) throw runtime_error("Could not open Weapon_data.json");
+        ifstream file("data/Weapon_data.json");
+        if (!file) throw runtime_error("Could not open data/Weapon_data.json");
         json j;
         try {
             file >> j;
