@@ -9,6 +9,12 @@
 using json = nlohmann::json;
 using namespace std;
 
+// Affix tuning shared with the player side (see Player.cpp).
+static constexpr int BLEED_CHANCE = 25;        // % chance a Goblin hit adds a bleed stack
+static constexpr int BLEED_TICK_PER_STACK = 3; // HP lost per stack at turn start (ignores dodge/armor)
+static constexpr int BLEED_MAX_STACKS = 5;
+static constexpr int CRIT_CHANCE = 20;         // % chance to crit (Werewolf + Dullahan)
+
 static const json& enemy_data() {
     static const json data = [] {
         ifstream file("data/Enemy_data.json");
@@ -19,7 +25,7 @@ static const json& enemy_data() {
         }();
     return data;
 }
-Enemy::Enemy(EnemyType et) : type(et), wave_number(1), difficulty(2) {
+Enemy::Enemy(EnemyType et) : type(et), wave_number(1), difficulty(2), bleed_stacks(0) {
     const json& e = enemy_data().at(type_to_string());
     health = e.at("Hp");
     max_health = health;
@@ -126,18 +132,44 @@ void Enemy::set_dodge_chance(int d) {
 void Enemy::set_min_level_req(int l) {
     min_level_req = l;
 }
-void Enemy::take_damage(int damage) {
+bool Enemy::take_damage(int damage) {
     if (dodge_attack()) {
-        cout << "The enemy dodged your attack!" << endl;
-        return;
+        cout << "The " << type_to_string() << " dodges your attack!" << endl;
+        return false;
     }
     health -= damage;
     if (health <= 0) {
-        cout << "You defeated a " << type_to_string() << "!" << endl;
+        cout << "You defeated the " << type_to_string() << "!" << endl;
     }
+    return true;
+}
+int Enemy::get_bleed_stacks() const {
+    return bleed_stacks;
+}
+void Enemy::add_bleed_stack() {
+    if (bleed_stacks < BLEED_MAX_STACKS) bleed_stacks++;
+    cout << "The " << type_to_string() << " is bleeding (" << bleed_stacks
+         << (bleed_stacks == 1 ? " stack" : " stacks") << ")!" << endl;
+}
+int Enemy::tick_bleed() {
+    if (bleed_stacks <= 0 || !is_alive()) return 0;
+    int tick = bleed_stacks * BLEED_TICK_PER_STACK;
+    health -= tick;
+    cout << "The " << type_to_string() << " bleeds for " << tick << " (" << bleed_stacks
+         << (bleed_stacks == 1 ? " stack" : " stacks") << ")!" << endl;
+    if (health <= 0) {
+        cout << "You defeated the " << type_to_string() << "!" << endl;
+    }
+    return tick;
+}
+void Enemy::clear_bleed() {
+    bleed_stacks = 0;
 }
 void Enemy::attack_player(Player& player) {
     if (!is_alive() || !player.is_alive()) return;
+    // Bleed ticks at the start of our turn, ignoring dodge (and armor). A lethal
+    // tick ends the turn: a bleeding-out enemy doesn't get to swing.
+    if (tick_bleed() > 0 && !is_alive()) return;
     // Troll special: regenerates a little at the start of each of its turns.
     if (type == EnemyType::Troll && health < max_health) {
         int regen = max_health * 5 / 100;
@@ -146,23 +178,40 @@ void Enemy::attack_player(Player& player) {
         if (health > max_health) health = max_health;
         cout << "The Troll regenerates " << regen << " HP!" << endl;
     }
-    int damage = attack_power;
-    // Werewolf special: 20% chance to crit for 1.5x damage.
-    bool crit = (type == EnemyType::Werewolf && roll_chance(20));
-    if (crit) damage = damage * 3 / 2;
-    int health_before = player.get_health();
-    player.take_damage(damage);
-    int dealt = health_before - player.get_health();
-    if (dealt < 0) dealt = 0;
-    if (crit) cout << "Critical hit! ";
-    cout << "The " << type_to_string() << " attacked you for " << damage << " damage!" << endl;
-    // Vampire special: drains 30% of the damage actually dealt as healing.
-    if (type == EnemyType::Vampire && dealt > 0 && is_alive()) {
-        int drain = dealt * 30 / 100;
-        if (drain < 1) drain = 1;
-        health += drain;
-        if (health > max_health) health = max_health;
-        cout << "The Vampire drains " << drain << " HP from you!" << endl;
+    // Skeleton special: two sequential swings (each with its own dodge + armor
+    // roll). The second still rolls after a dodge; wasted only if the target died.
+    int swings = (type == EnemyType::Skeleton) ? 2 : 1;
+    for (int s = 0; s < swings && player.is_alive(); s++) {
+        int damage = attack_power;
+        // Werewolf + Dullahan special: 20% chance to crit for 1.5x damage.
+        bool crit = ((type == EnemyType::Werewolf || type == EnemyType::Dullahan)
+                     && roll_chance(CRIT_CHANCE));
+        if (crit) damage = damage * 3 / 2;
+        int health_before = player.get_health();
+        if (!player.take_damage(damage)) {
+            cout << "You dodge the " << type_to_string() << "'s attack!" << endl;
+            continue;
+        }
+        int dealt = health_before - player.get_health();
+        if (dealt < 0) dealt = 0;
+        int blocked = damage - dealt;
+        if (blocked < 0) blocked = 0;
+        if (crit) cout << "Critical! ";
+        cout << "The " << type_to_string() << " hits you for " << dealt;
+        if (blocked > 0) cout << " (" << blocked << " blocked)";
+        cout << "." << endl;
+        // Vampire special: drains 30% of the damage actually dealt as healing.
+        if (type == EnemyType::Vampire && dealt > 0 && is_alive()) {
+            int drain = dealt * 30 / 100;
+            if (drain < 1) drain = 1;
+            health += drain;
+            if (health > max_health) health = max_health;
+            cout << "The Vampire drains " << drain << " HP from you!" << endl;
+        }
+        // Goblin special: 25% chance on a landed hit to add 1 bleed stack (cap 5).
+        if (type == EnemyType::Goblin && player.is_alive() && roll_chance(BLEED_CHANCE)) {
+            player.add_bleed_stack();
+        }
     }
 }
 bool Enemy::dodge_attack() const {

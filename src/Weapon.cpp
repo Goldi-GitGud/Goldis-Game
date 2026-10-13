@@ -95,6 +95,10 @@ string Weapon::get_effect_text() const {
     if (attack_bonus != 0) add("+" + to_string(attack_bonus) + " Attack");
     if (armor_bonus != 0) add("+" + to_string(armor_bonus) + " Armor");
     if (dodge_bonus != 0) add("+" + to_string(dodge_bonus) + "% Dodge");
+    // Affix identity (behavior lives in Player::attack_enemy / Enemy::attack_player).
+    if (type == WeaponType::Dagger) add("Bleeds on hit");
+    else if (type == WeaponType::Twinblade) add("Hits twice");
+    else if (type == WeaponType::Katana) add("20% crit x1.5");
     if (parts.empty()) return "No bonuses";
     return parts;
 }

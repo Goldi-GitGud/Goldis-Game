@@ -100,7 +100,8 @@ static void maybe_drop_loot(Bag& bag, const Enemy& enemy) {
         }
         Item item(drop);
         bag.addItem(item);
-        cout << "The " << enemy.type_to_string() << " dropped a " << item.get_name() << "!" << endl;
+        cout << "The " << enemy.type_to_string() << " dropped a " << item.get_name()
+             << " (added to your bag)!" << endl;
     }
 
     int weapon_chance = 5 + wave / 2;
@@ -115,7 +116,8 @@ static void maybe_drop_loot(Bag& bag, const Enemy& enemy) {
         };
         Weapon weapon(weapons[random_int(0, 9)]);
         bag.addWeapon(weapon);
-        cout << "The " << enemy.type_to_string() << " dropped a " << weapon.get_name() << "!" << endl;
+        cout << "The " << enemy.type_to_string() << " dropped a " << weapon.get_name()
+             << " (added to your bag)!" << endl;
     }
 }
 
@@ -281,6 +283,12 @@ Combat::TurnResult Combat::player_turn() {
 }
 
 void Combat::enemies_turn() {
+    // Player bleed ticks once here, at the start of the enemies' turn (ignores
+    // dodge). A lethal tick ends the round before any enemy swings.
+    if (player.tick_bleed() > 0 && !player.is_alive()) {
+        player.player_death();
+        return;
+    }
     for (Enemy& enemy : enemies) {
         if (!player.is_alive()) return;
         if (enemy.is_alive()) {
@@ -312,7 +320,8 @@ Combat::Result Combat::fight(int wave_number, int difficulty) {
     }
 
     wave_active = false;
-    player.clear_temporary_effects(); // potion boosts only last for one wave
+    player.clear_temporary_effects(); // potion boosts only last for one wave (bleed clears too)
+    for (Enemy& enemy : enemies) enemy.clear_bleed(); // defensive: dead-wave bleed never leaks
 
     if (!player.is_alive()) {
         cout << "You were defeated on wave " << wave_number << "." << endl;

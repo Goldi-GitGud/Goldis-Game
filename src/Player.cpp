@@ -8,6 +8,12 @@
 using json = nlohmann::json;
 using namespace std;
 
+// Weapon affix tuning (mirrors Enemy.cpp so both sides share the same rules).
+static constexpr int BLEED_CHANCE = 25;       // % chance a Dagger hit adds a bleed stack
+static constexpr int BLEED_TICK_PER_STACK = 3; // HP lost per stack at turn start
+static constexpr int BLEED_MAX_STACKS = 5;
+static constexpr int KATANA_CRIT_CHANCE = 20; // % chance a Katana hit crits (Werewolf rate)
+
 static const json& player_data() {
     static const json data = [] {
         ifstream file("data/Player_data.json");
@@ -70,6 +76,7 @@ Player::Player(PlayerClass pc)
     bonus_attack_power = weapon.getAttackBonus();
     bonus_armor = weapon.getArmorBonus();
     bonus_dodge_chance = weapon.getDodgeBonus();
+    bleed_stacks = 0; // bleed is wave-temporary, never loaded from saves
     if (health > get_effective_max_health()) health = get_effective_max_health();
 }
 
@@ -197,23 +204,61 @@ void Player::display_stats() const {
     cout << "____________________________________________" << endl;
 }
 void Player::attack_enemy(Enemy& enemy) {
-    int damage = attack_power + bonus_attack_power - enemy.get_armor();
-    if (damage < 0) damage = 0;
-    enemy.take_damage(damage);
-    cout << "You attacked the enemy for " << damage << " damage!" << endl;
+    // Twinblade: two sequential full hits through the same take_damage path
+    // (own dodge + armor roll each); the second is wasted if the first kills.
+    int swings = (weapon.getType() == Weapon::WeaponType::Twinblade) ? 2 : 1;
+    for (int s = 0; s < swings; s++) {
+        int raw = attack_power + bonus_attack_power;
+        // Katana: 20% chance to crit for 1.5x, same rate/mult as the Werewolf.
+        bool crit = (weapon.getType() == Weapon::WeaponType::Katana
+                     && roll_chance(KATANA_CRIT_CHANCE));
+        int pre_armor = crit ? raw * 3 / 2 : raw;
+        int damage = pre_armor - enemy.get_armor();
+        if (damage < 0) damage = 0;
+        if (!enemy.take_damage(damage)) continue; // dodged (line printed inside); Twinblade still swings again
+        if (crit)
+            cout << "Your " << weapon.get_name() << " CRITS the " << enemy.type_to_string()
+                 << " for " << damage << "!" << endl;
+        else
+            cout << "Your " << weapon.get_name() << " hits the " << enemy.type_to_string()
+                 << " for " << damage << "." << endl;
+        if (!enemy.is_alive()) break; // second swing wasted on a kill (no retarget)
+        // Dagger: 25% chance on a landed hit to add 1 bleed stack (cap 5).
+        if (weapon.getType() == Weapon::WeaponType::Dagger && roll_chance(BLEED_CHANCE))
+            enemy.add_bleed_stack();
+    }
 }
-void Player::take_damage(int damage) {
+bool Player::take_damage(int damage) {
     if (dodge_attack()) {
-        return;
+        return false; // dodge line is printed by the attacker (it knows its name)
     }
     int total_armor = armor + bonus_armor;
     int damage_taken = damage - total_armor;
     if (damage_taken < 0) damage_taken = 0;
     health -= damage_taken;
-    cout << "You took " << damage_taken << " damage!" << endl;
     if (health <= 0) {
         player_death();
     }
+    return true;
+}
+int Player::get_bleed_stacks() const {
+    return bleed_stacks;
+}
+void Player::add_bleed_stack() {
+    if (bleed_stacks < BLEED_MAX_STACKS) bleed_stacks++;
+    cout << "You are bleeding (" << bleed_stacks
+         << (bleed_stacks == 1 ? " stack" : " stacks") << ")!" << endl;
+}
+int Player::tick_bleed() {
+    if (bleed_stacks <= 0 || !is_alive()) return 0;
+    int tick = bleed_stacks * BLEED_TICK_PER_STACK;
+    health -= tick;
+    cout << "You bleed for " << tick << " (" << bleed_stacks
+         << (bleed_stacks == 1 ? " stack" : " stacks") << ")!" << endl;
+    return tick;
+}
+void Player::clear_bleed() {
+    bleed_stacks = 0;
 }
 // Stepped XP curve: cheap early levels, steeper mid game, grindy late game,
 // so a single kill can never trivially chain many level-ups at high level.
@@ -257,6 +302,7 @@ void Player::clear_temporary_effects() {
     bonus_attack_power = weapon.getAttackBonus();
     bonus_armor = weapon.getArmorBonus();
     bonus_dodge_chance = weapon.getDodgeBonus();
+    clear_bleed(); // bleed never carries past the wave
 }
 void Player::gain_gold(int amount) {
     gold += amount;
@@ -336,11 +382,8 @@ void Player::increase_dodge_chance(int amount) {
     cout << "Your dodge chance increased by " << amount << "%!" << endl;
 }
 bool Player::dodge_attack() {
-    if (roll_chance(dodge_chance + bonus_dodge_chance)) {
-        cout << "You dodged the enemy's attack!" << endl;
-        return true;
-    }
-    return false;
+    // Silent roll: the attacker prints the dodge line (only it knows its name).
+    return roll_chance(dodge_chance + bonus_dodge_chance);
 }
 bool Player::is_alive() const {
     return health > 0;

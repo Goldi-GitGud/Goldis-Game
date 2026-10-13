@@ -31,6 +31,7 @@ private:
     int min_level_req;
     int wave_number;  // wave this enemy spawned on (1-based); scales XP/gold rewards
     int difficulty;   // 1 = easy, 2 = normal, 3 = hard; scales XP/gold rewards
+    int bleed_stacks; // Dagger-inflicted bleed: 3 HP per stack at turn start, cap 5
 
 public:
     explicit Enemy(EnemyType et);
@@ -53,7 +54,11 @@ public:
     void set_armor(int a);
     void set_dodge_chance(int d);
     void set_min_level_req(int l);
-    void take_damage(int damage);
+    bool take_damage(int damage); // true if the hit landed (false = dodged)
+    int get_bleed_stacks() const;
+    void add_bleed_stack(); // +1 stack, up to 5 (Dagger hits)
+    int tick_bleed();       // 3 HP per stack, ignores dodge/armor; returns damage dealt
+    void clear_bleed();
     void attack_player(Player& player);
     bool dodge_attack() const;
     bool is_alive() const;
