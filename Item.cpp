@@ -8,22 +8,37 @@
 using json = nlohmann::json;
 using namespace std;
 
+// Data design (see Item_data.json): 3 tiers (Small/Medium/Large) x 4 effects
+// (Health/Attack/Armor/Dodge). Health heals immediately, the other three are
+// wave-long boosts applied via apply_effect(). Item_data.json was reviewed
+// for this task and left unchanged: the tiers scale cleanly
+// (HP 20/40/70, Atk 10/20/35, Armor 20/35/50, Dodge 5/10/20).
 static const json& item_data() {
     static const json data = [] {
         ifstream file("Item_data.json");
         if (!file) throw runtime_error("Could not open Item_data.json");
         json j;
-        file >> j;
+        try {
+            file >> j;
+        } catch (const json::parse_error& e) {
+            throw runtime_error(string("Item_data.json: invalid JSON: ") + e.what());
+        }
         return j;
         }();
     return data;
 }
 Item::Item(ItemType it) : type(it) {
-    const json& i = item_data().at(Type_to_string(it));
-    health_bonus = i.at("HealthBonus");
-    attack_bonus = i.at("AttackBonus");
-    armor_bonus = i.at("ArmorBonus");
-    dodge_bonus = i.at("DodgeBonus");
+    // A missing entry is a data bug: fail loudly naming the key. Missing
+    // *fields* default to 0 so new bonus fields can be added to the JSON
+    // without breaking old files.
+    const string key = Type_to_string(it);
+    auto entry = item_data().find(key);
+    if (entry == item_data().end())
+        throw runtime_error("Item_data.json: missing entry for \"" + key + "\"");
+    health_bonus = entry->value("HealthBonus", 0);
+    attack_bonus = entry->value("AttackBonus", 0);
+    armor_bonus = entry->value("ArmorBonus", 0);
+    dodge_bonus = entry->value("DodgeBonus", 0);
 }
 Item::ItemType Item::getType() const {
     return type;
@@ -59,6 +74,19 @@ string Item::Type_to_string(ItemType it) const {
 }
 string Item::get_name() const {
     return Type_to_string(type);
+}
+string Item::get_effect_text() const {
+    string parts;
+    auto add = [&parts](const string& p) {
+        if (!parts.empty()) parts += ", ";
+        parts += p;
+    };
+    if (health_bonus != 0) add("Restores " + to_string(health_bonus) + " HP");
+    if (attack_bonus != 0) add("+" + to_string(attack_bonus) + " Attack until wave ends");
+    if (armor_bonus != 0) add("+" + to_string(armor_bonus) + " Armor until wave ends");
+    if (dodge_bonus != 0) add("+" + to_string(dodge_bonus) + "% Dodge until wave ends");
+    if (parts.empty()) return "No effect";
+    return parts;
 }
 Item::ItemType Item::string_to_type(const string& name) {
     if (name == "Small_Health_potion") return ItemType::Small_Health_potion;
