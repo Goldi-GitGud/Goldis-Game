@@ -8,7 +8,7 @@
     "Greatsword":{
         "HealthBonus":15,
         "AttackBonus":42,
-        "ArmorBonus":10,
+        "ArmorBonus":8,
         "DodgeBonus":0
     },
     "Dagger":{
@@ -32,7 +32,7 @@
     "Mace":{
         "HealthBonus":25,
         "AttackBonus":28,
-        "ArmorBonus":10,
+        "ArmorBonus":12,
         "DodgeBonus":0
     },
     "Greataxe":{
@@ -57,6 +57,6 @@
         "HealthBonus":10,
         "AttackBonus":30,
         "ArmorBonus":2,
-        "DodgeBonus":10
+        "DodgeBonus":14
     }
 }
