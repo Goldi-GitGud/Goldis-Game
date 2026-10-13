@@ -7,32 +7,32 @@
     },
     "Greatsword":{
         "HealthBonus":15,
-        "AttackBonus":40,
+        "AttackBonus":42,
         "ArmorBonus":10,
-        "DodgeBonus":1
+        "DodgeBonus":0
     },
     "Dagger":{
         "HealthBonus":5,
-        "AttackBonus":20,
+        "AttackBonus":22,
         "ArmorBonus":0,
-        "DodgeBonus":10
+        "DodgeBonus":12
     },
     "Spear":{
         "HealthBonus":10,
         "AttackBonus":28,
-        "ArmorBonus":3,
+        "ArmorBonus":5,
         "DodgeBonus":5
     },
     "Axe":{
         "HealthBonus":15,
         "AttackBonus":34,
-        "ArmorBonus":2,
+        "ArmorBonus":4,
         "DodgeBonus":2
     },
     "Mace":{
-        "HealthBonus":20,
-        "AttackBonus":30,
-        "ArmorBonus":8,
+        "HealthBonus":25,
+        "AttackBonus":28,
+        "ArmorBonus":10,
         "DodgeBonus":0
     },
     "Greataxe":{
@@ -42,21 +42,21 @@
         "DodgeBonus":0
     },
     "Katana":{
-        "HealthBonus":10,
+        "HealthBonus":5,
         "AttackBonus":36,
         "ArmorBonus":0,
-        "DodgeBonus":8
+        "DodgeBonus":10
     },
     "Twinblade":{
         "HealthBonus":10,
         "AttackBonus":38,
-        "ArmorBonus":2,
-        "DodgeBonus":6
+        "ArmorBonus":0,
+        "DodgeBonus":8
     },
     "Saber":{
         "HealthBonus":10,
-        "AttackBonus":32,
+        "AttackBonus":30,
         "ArmorBonus":2,
-        "DodgeBonus":8
+        "DodgeBonus":10
     }
 }

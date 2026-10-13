@@ -7,22 +7,36 @@
 using json = nlohmann::json;
 using namespace std;
 
+// Data design (see Weapon_data.json): each weapon is one archetype, no two
+// share a profile. Baseline Sword (balanced 20/30/5/3), Mace (tank),
+// Dagger/Saber (dodge), Spear/Axe (bruiser), Katana/Twinblade (glass),
+// Greatsword/Greataxe (heavy, top attack).
 static const json& weapon_data() {
     static const json data = [] {
         ifstream file("Weapon_data.json");
         if (!file) throw runtime_error("Could not open Weapon_data.json");
         json j;
-        file >> j;
+        try {
+            file >> j;
+        } catch (const json::parse_error& e) {
+            throw runtime_error(string("Weapon_data.json: invalid JSON: ") + e.what());
+        }
         return j;
         }();
     return data;
 }
 Weapon::Weapon(WeaponType wt) : type(wt) {
-    const json& w = weapon_data().at(Type_to_string(wt));
-    health_bonus = w.at("HealthBonus");
-    attack_bonus = w.at("AttackBonus");
-    armor_bonus = w.at("ArmorBonus");
-    dodge_bonus = w.at("DodgeBonus");
+    // A missing entry is a data bug: fail loudly naming the key. Missing
+    // *fields* default to 0 so new bonus fields can be added to the JSON
+    // without breaking old files.
+    const string key = Type_to_string(wt);
+    auto entry = weapon_data().find(key);
+    if (entry == weapon_data().end())
+        throw runtime_error("Weapon_data.json: missing entry for \"" + key + "\"");
+    health_bonus = entry->value("HealthBonus", 0);
+    attack_bonus = entry->value("AttackBonus", 0);
+    armor_bonus = entry->value("ArmorBonus", 0);
+    dodge_bonus = entry->value("DodgeBonus", 0);
 }
 Weapon::WeaponType Weapon::getType() const {
     return type;
@@ -70,6 +84,19 @@ Weapon::WeaponType Weapon::string_to_type(const string& name) {
 }
 string Weapon::get_name() const {
     return Type_to_string(type);
+}
+string Weapon::get_effect_text() const {
+    string parts;
+    auto add = [&parts](const string& p) {
+        if (!parts.empty()) parts += ", ";
+        parts += p;
+    };
+    if (health_bonus != 0) add("+" + to_string(health_bonus) + " HP");
+    if (attack_bonus != 0) add("+" + to_string(attack_bonus) + " Attack");
+    if (armor_bonus != 0) add("+" + to_string(armor_bonus) + " Armor");
+    if (dodge_bonus != 0) add("+" + to_string(dodge_bonus) + "% Dodge");
+    if (parts.empty()) return "No bonuses";
+    return parts;
 }
 void Weapon::display_stats() const {
     cout << "  Weapon: " << get_name() << endl;

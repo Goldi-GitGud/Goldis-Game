@@ -34,6 +34,10 @@ public:
     int getDodgeBonus() const;
     std::string Type_to_string(ItemType it) const;
     std::string get_name() const;
+    // Short human-readable summary of the bonuses, e.g. "Restores 40 HP" or
+    // "+20 Armor until wave ends". Used by Bag::displayContents and item menus
+    // so players can preview effects without using the item.
+    std::string get_effect_text() const;
     static ItemType string_to_type(const std::string& name); // "Small_Health_potion" -> enum (used when loading saves)
     // Health heals right away. Attack/armor/dodge go into the player's bonus stats
     // and last until Player::clear_temporary_effects() (called when a wave ends).
