@@ -57,6 +57,9 @@ Player::Player(PlayerClass pc)
       weapon(Weapon::string_to_type(player_entry(pc).at("WeaponType").get<string>())) {
     const json& p = player_entry(pc);
     health = p.at("Health");
+    // MaxHealth is optional in the JSON; older data files only have Health.
+    max_health = p.contains("MaxHealth") ? p.at("MaxHealth").get<int>() : health;
+    if (max_health < 1) max_health = 1;
     attack_power = p.at("AttackPower");
     armor = p.at("Armor");
     dodge_chance = p.at("DodgeChance");
@@ -67,6 +70,7 @@ Player::Player(PlayerClass pc)
     bonus_attack_power = weapon.getAttackBonus();
     bonus_armor = weapon.getArmorBonus();
     bonus_dodge_chance = weapon.getDodgeBonus();
+    if (health > get_effective_max_health()) health = get_effective_max_health();
 }
 
 Player::PlayerClass Player::getType() const {
@@ -77,6 +81,13 @@ string Player::Type_to_string() const {
 }
 int Player::get_health() const {
     return health;
+}
+int Player::get_max_health() const {
+    return max_health;
+}
+int Player::get_effective_max_health() const {
+    int cap = max_health + bonus_health;
+    return cap < 1 ? 1 : cap;
 }
 int Player::get_bonus_health() const {
     return bonus_health;
@@ -115,10 +126,21 @@ void Player::set_type(PlayerClass pc) {
     type = pc;
 }
 void Player::set_health(int h) {
-    health = h;
+    // Clamp overheal-style values to the effective cap; the floor is left
+    // alone so take_damage()'s death flow (health <= 0) keeps working.
+    int cap = get_effective_max_health();
+    health = (h > cap) ? cap : h;
+}
+void Player::set_max_health(int mh) {
+    max_health = (mh < 1) ? 1 : mh;
+    int cap = get_effective_max_health();
+    if (health > cap) health = cap;
 }
 void Player::set_bonus_health(int bh) {
     bonus_health = bh;
+    // A smaller bonus lowers the effective cap, so trim current HP to fit.
+    int cap = get_effective_max_health();
+    if (health > cap) health = cap;
 }
 void Player::set_attack_power(int ap) {
     attack_power = ap;
@@ -153,13 +175,23 @@ void Player::equip_weapon(const Weapon& w) {
 void Player::display_stats() const {
     cout << "____________________________________________" << endl;
     cout << "Player Stats (" << Type_to_string() << "):" << endl;
-    cout << "Health: " << health << endl;
-    cout << "Attack Power: " << attack_power << endl;
-    cout << "Armor: " << armor << endl;
-    cout << "Level: " << level << endl;
+    cout << "Health: " << health << " / " << get_effective_max_health()
+         << " (base max " << max_health << " + bonus " << bonus_health << ")" << endl;
+    cout << "Attack Power: " << attack_power << " + " << bonus_attack_power
+         << " = " << (attack_power + bonus_attack_power) << endl;
+    cout << "Armor: " << armor << " + " << bonus_armor
+         << " = " << (armor + bonus_armor) << endl;
+    cout << "Level: " << level;
+    if (level >= MAX_LEVEL) {
+        cout << " (MAX)";
+    } else {
+        cout << " (XP: " << experience << " / " << experience_to_next_level(level) << " to next)";
+    }
+    cout << endl;
     cout << "Experience: " << experience << endl;
     cout << "Gold: " << gold << endl;
-    cout << "Dodge Chance: " << dodge_chance << "%" << endl;
+    cout << "Dodge Chance: " << dodge_chance << "% + " << bonus_dodge_chance
+         << "% = " << (dodge_chance + bonus_dodge_chance) << "%" << endl;
     cout << "Weapon Stats:" << endl;
     weapon.display_stats();
     cout << "____________________________________________" << endl;
@@ -183,13 +215,28 @@ void Player::take_damage(int damage) {
         player_death();
     }
 }
+// Stepped XP curve: cheap early levels, steeper mid game, grindy late game,
+// so a single kill can never trivially chain many level-ups at high level.
+// Tier 1-4: 100, 150, 200, 250 | Tier 5-9: 300, 400, ..., 700 | Tier 10+: 800, 1000, ...
+int Player::experience_to_next_level(int level) {
+    if (level < 1) level = 1;
+    if (level < 5) return 100 + (level - 1) * 50;
+    if (level < 10) return 300 + (level - 5) * 100;
+    return 800 + (level - 10) * 200;
+}
 void Player::gain_experience(int exp) {
-    // this still needs to be adjusted and edge cases handled, but it works for now
+    if (exp <= 0) return;
+    if (level >= MAX_LEVEL) {
+        cout << "You gained " << exp << " experience! (already max level " << MAX_LEVEL << ")" << endl;
+        return;
+    }
     experience += exp;
     cout << "You gained " << exp << " experience!" << endl;
-    while (experience >= level * 100) {
+    while (level < MAX_LEVEL && experience >= experience_to_next_level(level)) {
+        experience -= experience_to_next_level(level);
         gain_level();
     }
+    // Leftover XP past max level is banked, not lost.
 }
 // Swaps the old weapon's bonuses for the new weapon's, so potion boosts on top of them are kept.
 void Player::change_weapon(const Weapon& new_weapon) {
@@ -226,17 +273,36 @@ void Player::lose_experience(int amount) {
     cout << "You lost " << amount << " experience!" << endl;
 }
 void Player::player_death() {
+    // NOTE: XP/gold death penalties used to live here, but Game::run
+    // discards the whole Player object on death (game over), so any penalty
+    // applied here never mattered. Penalties were removed instead of being
+    // left as misleading dead code; death handling (game-over flow) lives in
+    // Game/Combat. This hook is kept so the public API stays stable.
     cout << "You have died!" << endl;
-    lose_experience(experience / 2);
-    lose_gold(static_cast<int>(gold * 0.4));
 }
 void Player::gain_level() {
-    // stats will be adjusted later
+    // Stepped, diminishing gains: full early, halved mid, minimal past 10,
+    // with a hard cap at MAX_LEVEL so stats can't scale forever.
+    if (level >= MAX_LEVEL) return;
+    int hp_gain, atk_gain, armor_gain, dodge_gain;
+    if (level < 5) {
+        hp_gain = 20; atk_gain = 5; armor_gain = 2; dodge_gain = 1;
+    } else if (level < 10) {
+        hp_gain = 12; atk_gain = 3; armor_gain = 1; dodge_gain = 1;
+    } else {
+        hp_gain = 8; atk_gain = 1; armor_gain = 1; dodge_gain = 0;
+    }
     level++;
-    health += 20;
-    attack_power += 5;
-    armor += 2;
-    dodge_chance += 1;
+    max_health += hp_gain;
+    health += hp_gain; // level-up restores the HP it grants
+    int cap = get_effective_max_health();
+    if (health > cap) health = cap;
+    attack_power += atk_gain;
+    armor += armor_gain;
+    // Keep total dodge (base + bonus) from growing without bound.
+    if (dodge_gain > 0 && (dodge_chance + bonus_dodge_chance) < 40) {
+        dodge_chance += dodge_gain;
+    }
     cout << "You leveled up! You are now level " << level << "!" << endl;
 }
 void Player::use_item(const Item& item) {
@@ -244,8 +310,18 @@ void Player::use_item(const Item& item) {
     cout << "You used " << item.get_name() << "!" << endl;
 }
 void Player::heal(int amount) {
-    health += amount;
-    cout << "You healed " << amount << " health!" << endl;
+    if (amount <= 0) return;
+    int cap = get_effective_max_health();
+    int missing = cap - health;
+    if (missing <= 0) {
+        cout << "You are already at full health!" << endl;
+        return;
+    }
+    int actual = (amount > missing) ? missing : amount;
+    health += actual;
+    cout << "You healed " << actual << " health!";
+    if (actual < amount) cout << " (capped at max " << cap << ")";
+    cout << endl;
 }
 void Player::increase_attack_power(int amount) {
     attack_power += amount;
