@@ -19,9 +19,10 @@ private:
     std::optional<Combat> combat; // keeps references to player and bag, so it's declared after them
     int wave;
     int difficulty; // 1 = easy, 2 = normal, 3 = hard. A global setting, not part of a save.
+    bool rested_this_camp = false; // free rest is once per camp visit; reset on entering camp
 
     bool camp(); // the menu between waves. Returns false if the player chose to pause.
-    void camp_heal();  // heal choice: scaled paid heal or free level-scaled rest
+    void camp_heal();  // heal choice: repeatable scaled paid heal, free rest once per camp visit
     void camp_equip(); // T6: swap to a bag weapon via Player::change_weapon
     void camp_shop();  // level-gated buy/sell shop using gold (DESIGN.md #4)
 

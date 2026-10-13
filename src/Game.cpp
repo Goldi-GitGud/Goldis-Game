@@ -33,6 +33,7 @@ bool Game::has_game() const {
 // ---- the menu between waves ----
 
 bool Game::camp() {
+    rested_this_camp = false; // fresh visit: the one free rest is available again
     while (true) {
         // No max-HP exists yet (T4 adds the cap); show current HP plus the
         // weapon bonus, plus everything else the camp hub needs (T6).
@@ -81,8 +82,9 @@ bool Game::camp() {
     }
 }
 
-// Camp heal choice: paid heal scales with effective max HP, free rest scales
-// with level. At full HP nothing is charged; Player::heal caps at the max.
+// Camp heal choice: paid heal scales with effective max HP and is repeatable
+// while gold lasts; free rest scales with level and is once per camp visit.
+// At full HP nothing is charged; Player::heal caps at the max.
 void Game::camp_heal() {
     while (true) {
         int cap = player->get_effective_max_health();
@@ -99,7 +101,11 @@ void Game::camp_heal() {
         cout << "____________________________________________" << endl;
         cout << "Heal (HP: " << hp << "/" << cap << ", missing " << missing << ")" << endl;
         cout << "1. Paid heal (" << cost << "g -> +" << paid_amount << " HP)" << endl;
-        cout << "2. Free rest (+" << rest_amount << " HP)" << endl;
+        if (rested_this_camp) {
+            cout << "2. Free rest (already rested this visit)" << endl;
+        } else {
+            cout << "2. Free rest (+" << rest_amount << " HP, once per visit)" << endl;
+        }
         cout << "0. Back" << endl;
         cout << "Enter your choice: ";
         int choice = read_choice(0, 2);
@@ -114,6 +120,11 @@ void Game::camp_heal() {
             player->lose_gold(cost);
             player->heal(paid_amount);
         } else {
+            if (rested_this_camp) {
+                cout << "You already rested during this visit. Come back after the next wave." << endl;
+                continue;
+            }
+            rested_this_camp = true;
             player->heal(rest_amount);
         }
         // Loop back so a partial heal can be topped up; the full-HP check
