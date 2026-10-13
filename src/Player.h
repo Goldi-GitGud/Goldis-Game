@@ -33,6 +33,7 @@ private:
     int experience;
     int gold;
     Weapon weapon;
+    int bleed_stacks; // Goblin-inflicted bleed: 3 HP per stack at enemies_turn, cap 5
 
 public:
     explicit Player(PlayerClass pc);
@@ -72,7 +73,11 @@ public:
     void display_stats() const;// will display the stats of the player, including bonuses from weapon and items
 
     void attack_enemy(Enemy& enemy);
-    void take_damage(int damage);
+    bool take_damage(int damage); // true if the hit landed (false = dodged)
+    int get_bleed_stacks() const;
+    void add_bleed_stack(); // +1 stack, up to 5 (Goblin hits)
+    int tick_bleed();       // 3 HP per stack, ignores dodge/armor; returns damage dealt
+    void clear_bleed();
     void gain_experience(int exp);
     void change_weapon(const Weapon& new_weapon);
     void clear_temporary_effects(); // potion boosts wear off; only the weapon's bonuses stay
