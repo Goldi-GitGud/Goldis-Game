@@ -20,6 +20,7 @@ public:
     void launch_game();
     bool launch_pause(); // returns true if the game should resume
     void launch_options();
+    void how_to_play();  // short instructions screen (T10)
     void launch_exit(int exit_code);
     bool difficulty();   // returns true if a difficulty was chosen, false if the player went back
 };

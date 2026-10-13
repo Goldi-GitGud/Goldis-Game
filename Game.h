@@ -21,6 +21,9 @@ private:
     int difficulty; // 1 = easy, 2 = normal, 3 = hard. A global setting, not part of a save.
 
     bool camp(); // the menu between waves. Returns false if the player chose to pause.
+    void camp_heal();  // T6: paid heal, or small free rest when broke
+    void camp_equip(); // T6: swap to a bag weapon via Player::change_weapon
+    void camp_shop();  // T6: minimal buy/sell stub using gold
 
 public:
     Game();
@@ -37,6 +40,9 @@ public:
     int get_difficulty() const;
     std::string get_difficulty_name() const;
     void set_difficulty(int d);
+    // True while a wave is unfinished (paused mid-fight). Saves taken now
+    // reload at the same wave number but restart that wave fresh (see DESIGN.md #8).
+    bool is_mid_wave() const;
     int get_wave() const;
     const Player& get_player() const;
     const Bag& get_bag() const;

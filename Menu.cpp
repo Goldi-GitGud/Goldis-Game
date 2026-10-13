@@ -9,10 +9,11 @@ void Menu::display_menu() {
         cout << "___________________________________________" << endl;
         cout << "1. Start Game" << endl;
         cout << "2. Options" << endl;
-        cout << "3. Exit" << endl;
+        cout << "3. How to Play" << endl;
+        cout << "4. Exit" << endl;
         cout << "___________________________________________" << endl;
         cout << "Enter your choice: ";
-        int choice = read_choice(1, 3);
+        int choice = read_choice(1, 4);
         switch (choice)
         {
         case 1:
@@ -22,6 +23,9 @@ void Menu::display_menu() {
             launch_options();
             break;
         case 3:
+            how_to_play();
+            break;
+        case 4:
             launch_exit(0);
             break;
         }
@@ -133,6 +137,18 @@ void Menu::launch_options() {
     }
 }
 
+void Menu::how_to_play() {
+    cout << "____________________________________________" << endl;
+    cout << "How to Play" << endl;
+    cout << "Survive endless waves of enemies. Between waves you rest at camp:" << endl;
+    cout << "heal, equip weapons, buy/sell in the shop, and use items." << endl;
+    cout << "In a wave, pick Attack or Use item, then choose a target." << endl;
+    cout << "Kills earn XP (level up at level*100) and gold for the shop." << endl;
+    cout << "You can pause anytime; saving mid-wave restarts that wave fresh." << endl;
+    cout << "Death ends the run (permadeath). Difficulty affects all saves." << endl;
+    cout << "____________________________________________" << endl;
+}
+
 void Menu::launch_exit(int code) {
     if (code == 0) {
         cout << "Thank you for playing the game!" << endl;
@@ -147,9 +163,9 @@ bool Menu::difficulty() {
     cout << "____________________________________________" << endl;
     cout << "Current difficulty level: " << game.get_difficulty_name() << endl;
     cout << " choose difficulty level: " << endl;
-    cout << "1. Easy (The enemies are weaker and you are a bit more stronger)" << endl;
-    cout << "2. Normal (Balanced difficulty , recommended for most players)" << endl;
-    cout << "3. Hard (The enemies are significantly stronger , recommended for experienced players)" << endl;
+    cout << "1. Easy (Enemies are weaker and you are a bit stronger)" << endl;
+    cout << "2. Normal (Balanced difficulty, recommended for most players)" << endl;
+    cout << "3. Hard (Enemies are significantly stronger, recommended for experienced players)" << endl;
     cout << "4. Return to Previous Menu" << endl;
     cout << "Note: This will affect all saves and can be changed from the options menu." << endl;
     cout << "____________________________________________" << endl;
