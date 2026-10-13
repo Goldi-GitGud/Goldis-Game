@@ -21,9 +21,9 @@ private:
     int difficulty; // 1 = easy, 2 = normal, 3 = hard. A global setting, not part of a save.
 
     bool camp(); // the menu between waves. Returns false if the player chose to pause.
-    void camp_heal();  // T6: paid heal, or small free rest when broke
+    void camp_heal();  // heal choice: scaled paid heal or free level-scaled rest
     void camp_equip(); // T6: swap to a bag weapon via Player::change_weapon
-    void camp_shop();  // T6: minimal buy/sell stub using gold
+    void camp_shop();  // level-gated buy/sell shop using gold (DESIGN.md #4)
 
 public:
     Game();
