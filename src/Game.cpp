@@ -264,7 +264,8 @@ void Game::camp_shop() {
     const int kItemCount = 12;
     const int kWeaponCount = 10;
     const int kSellItem = kItemCount + kWeaponCount + 1;
-    const int kSellWeapon = kItemCount + kWeaponCount + 2;
+    // Sell-weapon is the last row (kSellItem + 1); the trailing else covers it
+    // since read_choice already bounds input to the printed count.
     while (true) {
         int level = player->get_level();
         cout << "____________________________________________" << endl;

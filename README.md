@@ -11,6 +11,21 @@ Requires a C++17 compiler. From the `app/` directory:
 g++ -std=c++17 -o start.exe src/start.cpp src/Game.cpp src/Menu.cpp src/Manager.cpp src/Combat.cpp src/Player.cpp src/Enemy.cpp src/Item.cpp src/Weapon.cpp src/Bag.cpp src/Utils.cpp
 ```
 
+## Build (CMake, recommended)
+
+```sh
+cmake -S . -B build
+cmake --build build
+```
+
+This produces `build/start` (`start.exe` on Windows) and copies `data/`
+next to it. Run from the binary's own directory — saves
+(`save_slot_*.json`, git-ignored) land in the working directory:
+
+```sh
+cd build && ./start        # Windows: start.exe
+```
+
 ## Run
 
 You MUST run from the `app/` directory (data paths `data/*_data.json` and
