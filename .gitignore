@@ -3,6 +3,7 @@
 *.o
 *.obj
 build/
+dist/
 cmake-build-*/
 CMakeFiles/
 CMakeCache.txt

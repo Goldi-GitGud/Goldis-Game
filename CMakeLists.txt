@@ -37,3 +37,13 @@ add_custom_command(TARGET start POST_BUILD
         ${CMAKE_SOURCE_DIR}/data
         $<TARGET_FILE_DIR:start>/data
 )
+
+# Install rules: `cmake --install build --prefix dist` produces a playable
+# folder with the binary + data/ side by side. Zip the prefix folder and
+# share it; your friends just unzip and run start (saves land next to it).
+install(TARGETS start
+    RUNTIME DESTINATION .
+)
+install(DIRECTORY data
+    DESTINATION .
+)

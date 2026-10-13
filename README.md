@@ -26,6 +26,16 @@ next to it. Run from the binary's own directory — saves
 cd build && ./start        # Windows: start.exe
 ```
 
+## Share with friends (install)
+
+```sh
+cmake --install build --prefix dist
+```
+
+This puts `start` + `data/` into `dist/`. Zip that folder and send it —
+your friends just unzip and run it, no compiler needed. Saves
+(`save_slot_*.json`) are created next to the game when they play.
+
 ## Run
 
 You MUST run from the `app/` directory (data paths `data/*_data.json` and
