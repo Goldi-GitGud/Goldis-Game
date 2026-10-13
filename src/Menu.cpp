@@ -144,7 +144,7 @@ void Menu::how_to_play() {
     cout << "heal, equip weapons, buy/sell in the shop, and use items." << endl;
     cout << "In a wave, pick Attack or Use item, then choose a target." << endl;
     cout << "Kills earn XP (level up at level*100) and gold for the shop." << endl;
-    cout << "You can pause anytime; saving mid-wave restarts that wave fresh." << endl;
+    cout << "You can pause anytime, saving mid-wave restarts that wave fresh." << endl;
     cout << "Death ends the run (permadeath). Difficulty affects all saves." << endl;
     cout << "____________________________________________" << endl;
 }
