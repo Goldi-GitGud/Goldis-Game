@@ -35,7 +35,7 @@
         "MinLevel":3
     },
     "Troll":{
-        "Hp":140,
+        "Hp":150,
         "Attack":26,
         "Armor":10,
         "Dodge":0,
@@ -59,7 +59,7 @@
         "Hp":160,
         "Attack":46,
         "Armor":10,
-        "Dodge":10,
+        "Dodge":12,
         "MinLevel":8
     },
     "Vampire":{
