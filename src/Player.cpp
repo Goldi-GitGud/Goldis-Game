@@ -214,7 +214,10 @@ void Player::attack_enemy(Enemy& enemy) {
                      && roll_chance(KATANA_CRIT_CHANCE));
         int pre_armor = crit ? raw * 3 / 2 : raw;
         int damage = pre_armor - enemy.get_armor();
-        if (damage < 0) damage = 0;
+        // Chip: a real swing always bruises for 1, so high-armor targets
+        // (e.g. Dragon) can't be whittled at literally zero per hit.
+        if (pre_armor <= 0) damage = 0;
+        else if (damage < 1) damage = 1;
         if (!enemy.take_damage(damage)) continue; // dodged (line printed inside); Twinblade still swings again
         if (crit)
             cout << "Your " << weapon.get_name() << " CRITS the " << enemy.type_to_string()
@@ -234,7 +237,10 @@ bool Player::take_damage(int damage) {
     }
     int total_armor = armor + bonus_armor;
     int damage_taken = damage - total_armor;
-    if (damage_taken < 0) damage_taken = 0;
+    if (damage <= 0) damage_taken = 0;
+    // Chip: a landed hit always bruises for 1, so armor reduces trash hits
+    // to a scratch instead of negating them entirely.
+    else if (damage_taken < 1) damage_taken = 1;
     health -= damage_taken;
     if (health <= 0) {
         player_death();

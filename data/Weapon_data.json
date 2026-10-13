@@ -32,7 +32,7 @@
     "Mace":{
         "HealthBonus":25,
         "AttackBonus":28,
-        "ArmorBonus":12,
+        "ArmorBonus":9,
         "DodgeBonus":0
     },
     "Greataxe":{
