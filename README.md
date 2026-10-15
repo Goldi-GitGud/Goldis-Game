@@ -1,55 +1,81 @@
-# Terminal RPG (Goldi's Game)
+# Goldi's Game — Terminal RPG
 
-Layout: `src/` holds all sources (each class's `.h` + `.cpp` together,
-plus `start.cpp` and `json.hpp`); `data/` holds the `*_data.json` stat files.
+A turn-based, endless wave-crawler RPG for the terminal, written in C++17.
+Pick a class, survive waves of enemies, earn XP and gold, and spend it at the camp shop. Death ends the run.
 
-## Build (g++, current)
+## Features
 
-Requires a C++17 compiler. From the `app/` directory:
+- 9 playable classes (Warrior, Knight, Rogue, Paladin, Berserker, Monk, Assassin, Duelist, Hunter) with distinct stats and starting weapons
+- 13 enemies (Slime → Dragon) with level gating, wave scaling, and specials (regen, lifesteal, crits, bleed)
+- Turn-based combat: attack, use items, target selection, dodge/armor mitigation
+- Camp hub between waves: heal, equip weapons, shop (buy/sell), view stats/bag
+- Level-gated shop: potions + 10 weapons, unlocks at Lv 5 / Lv 10, sell-back at 1/3 price
+- XP and leveling (`level * 100` threshold), gold economy, weapon bonuses
+- 3 save slots (JSON), pause/resume, Easy / Normal / Hard difficulty (changeable anytime)
+- Data-driven stats: all classes, enemies, weapons, and items live in `data/*.json`
 
-```sh
-g++ -std=c++17 -o start.exe src/start.cpp src/Game.cpp src/Menu.cpp src/Manager.cpp src/Combat.cpp src/Player.cpp src/Enemy.cpp src/Item.cpp src/Weapon.cpp src/Bag.cpp src/Utils.cpp
-```
+## Requirements
 
-## Build (CMake, recommended)
+- C++17 compiler (MSVC, GCC, or Clang)
+- CMake 3.16+
+- A terminal (Windows, Linux, macOS)
+
+## Build
 
 ```sh
 cmake -S . -B build
 cmake --build build
 ```
 
-This produces `build/start` (`start.exe` on Windows) and copies `data/`
-next to it. Run from the binary's own directory — saves
-(`save_slot_*.json`, git-ignored) land in the working directory:
+## Run
+
+The game loads `data/*_data.json` relative to the working directory, and `data/` is copied next to the binary on every build. Run from the binary's directory:
 
 ```sh
-cd build && ./start        # Windows: start.exe
+cd build
+./start        # Windows: start.exe
 ```
 
-## Share with friends (install)
+Saves (`save_slot_*.json`) are created in the working directory and are git-ignored.
+
+## Share a playable copy
 
 ```sh
 cmake --install build --prefix dist
 ```
 
-This puts `start` + `data/` into `dist/`. Zip that folder and send it —
-your friends just unzip and run it, no compiler needed. Saves
-(`save_slot_*.json`) are created next to the game when they play.
+Zip the `dist/` folder (binary + `data/`). No compiler needed to play.
 
-## Run
+## How to play
 
-You MUST run from the `app/` directory (data paths `data/*_data.json` and
-runtime saves `save_slot_N.json` are relative to the working directory):
+1. Main menu → Start Game → New Game → pick a class + difficulty.
+2. Camp → `Start wave` → fight until all enemies die.
+3. Kills earn XP (level up) and gold. Between waves: heal, equip, shop.
+4. Pause anytime to save (3 slots), change difficulty, or quit.
+5. Mid-wave saves reload at the same wave number but the wave restarts fresh.
+6. Death is permanent — the run summary is the end of that run.
 
-```sh
-./start.exe        # Windows: start.exe
+In combat you choose `Attack / Use item / View stats / Pause` each turn, then pick a target. Potions heal or buff attack/armor/dodge until the wave ends.
+
+## Project structure
+
+```
+app/
+├── src/            # all sources (.h + .cpp per class) + start.cpp entry point
+│   ├── Game.*      # run owner: camp hub, shop, heal, wave loop
+│   ├── Combat.*    # one wave: spawning, turn loop, rewards
+│   ├── Player.*    # classes, stats, XP/level, damage, heal
+│   ├── Enemy.*     # enemy types, damage, XP/gold values
+│   ├── Item.*      # 12 potions and their effects
+│   ├── Weapon.*    # 10 weapons (stat bonuses)
+│   ├── Bag.*       # inventory (items + weapons)
+│   ├── Manager.*   # save/load for 3 slots
+│   ├── Menu.*      # main / game / pause / options menus
+│   └── Utils.*     # RNG + robust numeric input
+├── data/           # Player_data.json, Enemy_data.json, Weapon_data.json, Item_data.json
+├── CMakeLists.txt  # one add_executable over src/*.cpp, copies data/ next to binary
 ```
 
-## Next: CMake
+## Third-party
 
-This layout is CMake-ready: one `add_executable` over `src/*.cpp` with
-`target_include_directories(... src)`, plus copying `data/` next to the
-binary (or setting the run working directory to `app/`). Saves stay in the
-working directory and are git-ignored (`save_slot_*.json`).
-
-See `DESIGN.md` for scope decisions and `GAME_STATUS.md` for the task plan.
+- `src/json.hpp` — [nlohmann/json](https://github.com/nlohmann/json) single-header library (MIT) for loading `data/` files and saves.
